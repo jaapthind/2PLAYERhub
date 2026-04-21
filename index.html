@@ -1,845 +1,1513 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Multiplayer Wars - Ultimate 50-Game Engine</title>
-<style>
-/* ==========================================================================
-   CSS CORE ARCHITECTURE (Aesthetic & Layout)
-   ========================================================================== */
-:root {
-    --color-bg-dark: #07070f;
-    --color-bg-panel: rgba(15, 20, 35, 0.6);
-    --color-border: rgba(100, 150, 255, 0.2);
-    --color-p1: #00f3ff;
-    --color-p1-glow: rgba(0, 243, 255, 0.5);
-    --color-p2: #ff0055;
-    --color-p2-glow: rgba(255, 0, 85, 0.5);
-    --color-text: #e0e5ff;
-    --color-text-dim: #7a8ba8;
-    --font-ui: "Inter", -apple-system, sans-serif;
-    --font-mono: "Fira Code", monospace;
-    --glass-blur: blur(20px);
-}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multiplayer Wars - Ultimate Canvas Collection</title>
+    <style>
+        :root {
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --glass-shadow: rgba(0, 0, 0, 0.5);
+            --accent-cyan: #00f3ff;
+            --accent-pink: #ff00ea;
+            --text-main: #ffffff;
+            --bg-color: #050510;
+        }
 
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+        }
 
-body {
-    background-color: var(--color-bg-dark);
-    background-image: 
-        radial-gradient(circle at 20% 30%, rgba(0, 243, 255, 0.03) 0%, transparent 40%),
-        radial-gradient(circle at 80% 70%, rgba(255, 0, 85, 0.03) 0%, transparent 40%),
-        linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
-    background-size: 100% 100%, 100% 100%, 30px 30px, 30px 30px;
-    color: var(--color-text);
-    font-family: var(--font-ui);
-    overflow: hidden;
-    width: 100vw; height: 100vh;
-}
+        body {
+            background-color: var(--bg-color);
+            background-image: radial-gradient(circle at 50% 50%, #1a1a2e 0%, #050510 100%);
+            color: var(--text-main);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
 
-#app-container {
-    position: relative; width: 100%; height: 100%; display: flex; flex-direction: column;
-}
+        #console-container {
+            width: 95vw;
+            height: 90vh;
+            max-width: 1600px;
+            max-height: 900px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            box-shadow: 0 20px 50px var(--glass-shadow), inset 0 0 0 1px rgba(255,255,255,0.05);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+        }
 
-/* --- DASHBOARD UI --- */
-#dashboard {
-    position: absolute; inset: 0;
-    display: flex; flex-direction: column;
-    padding: 3vw 5vw;
-    backdrop-filter: var(--glass-blur);
-    -webkit-backdrop-filter: var(--glass-blur);
-    z-index: 100;
-    transition: opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1), transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-}
+        header {
+            padding: 20px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--glass-border);
+            background: rgba(0,0,0,0.2);
+            z-index: 10;
+        }
 
-.header-banner {
-    text-align: center; margin-bottom: 2rem; flex-shrink: 0;
-}
+        h1 {
+            font-size: 24px;
+            font-weight: 800;
+            letter-spacing: 2px;
+            background: linear-gradient(90deg, var(--accent-cyan), var(--accent-pink));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-transform: uppercase;
+        }
 
-.header-banner h1 {
-    font-size: clamp(3rem, 5vw, 5rem); font-weight: 900; letter-spacing: -2px;
-    background: linear-gradient(135deg, var(--color-p1), #b200ff, var(--color-p2));
-    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-    filter: drop-shadow(0 0 20px rgba(178, 0, 255, 0.4));
-    text-transform: uppercase; margin-bottom: 0.5rem;
-}
+        #status-bar {
+            font-size: 14px;
+            color: #aaa;
+            display: flex;
+            gap: 20px;
+        }
 
-.header-banner p { font-size: 1.2rem; color: var(--color-text-dim); }
+        #main-display {
+            flex: 1;
+            position: relative;
+            display: flex;
+        }
 
-.grid-viewport {
-    flex-grow: 1; overflow-y: auto; overflow-x: hidden;
-    padding: 10px; padding-bottom: 80px;
-    mask-image: linear-gradient(to bottom, black 90%, transparent 100%);
-    -webkit-mask-image: linear-gradient(to bottom, black 90%, transparent 100%);
-}
+        #menu-screen {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            padding: 40px;
+            overflow-y: auto;
+            z-index: 5;
+            background: rgba(0,0,0,0.4);
+            transition: opacity 0.3s ease;
+        }
 
-.grid-viewport::-webkit-scrollbar { width: 8px; }
-.grid-viewport::-webkit-scrollbar-track { background: rgba(0,0,0,0.3); border-radius: 4px; }
-.grid-viewport::-webkit-scrollbar-thumb { background: var(--color-border); border-radius: 4px; }
-.grid-viewport::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.3); }
+        #menu-screen.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
 
-.module-grid {
-    display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 25px;
-}
+        .game-card {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 16px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            position: relative;
+            overflow: hidden;
+        }
 
-.module-card {
-    background: var(--color-bg-panel); border: 1px solid var(--color-border);
-    border-radius: 20px; padding: 30px 25px;
-    position: relative; overflow: hidden; cursor: pointer;
-    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-    min-height: 180px; display: flex; flex-direction: column; justify-content: center;
-}
+        .game-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.05), transparent);
+            transform: translateX(-100%);
+            transition: transform 0.6s;
+        }
 
-.module-card::before {
-    content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.08), transparent);
-    transform: skewX(-20deg); transition: 0.5s ease;
-}
+        .game-card:hover {
+            transform: translateY(-5px);
+            background: rgba(255,255,255,0.08);
+            border-color: var(--accent-cyan);
+            box-shadow: 0 10px 20px rgba(0, 243, 255, 0.1);
+        }
 
-.module-card:hover {
-    transform: translateY(-10px) scale(1.03);
-    background: rgba(30, 40, 60, 0.8);
-    border-color: rgba(255,255,255,0.3);
-    box-shadow: 0 20px 50px rgba(0, 243, 255, 0.15), inset 0 0 0 1px rgba(255,255,255,0.1);
-}
+        .game-card:hover::before {
+            transform: translateX(100%);
+        }
 
-.module-card:hover::before { left: 150%; }
+        .game-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-main);
+        }
 
-.mc-id { position: absolute; top: 20px; right: 25px; font-family: var(--font-mono); font-size: 0.85rem; color: var(--color-text-dim); opacity: 0.6; }
-.mc-title { font-size: 1.5rem; font-weight: 800; margin-bottom: 15px; color: #fff; letter-spacing: 0.5px; }
-.mc-desc { font-size: 0.95rem; color: var(--color-text-dim); line-height: 1.5; }
-.mc-tag { display: inline-block; padding: 4px 10px; background: rgba(255,255,255,0.05); border-radius: 6px; font-size: 0.75rem; margin-top: 15px; text-transform: uppercase; letter-spacing: 1px; color: rgba(255,255,255,0.5); }
+        .game-desc {
+            font-size: 12px;
+            color: #888;
+            line-height: 1.4;
+            flex-grow: 1;
+        }
 
-/* --- GAME ENGINE UI --- */
-#engine-viewport { position: absolute; inset: 0; display: none; background: #000; z-index: 50; }
-canvas { display: block; width: 100%; height: 100%; }
+        .game-controls {
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            font-size: 11px;
+            color: #aaa;
+            display: flex;
+            justify-content: space-between;
+        }
 
-.btn-sys {
-    position: absolute; background: var(--color-bg-panel); border: 1px solid var(--color-border);
-    color: #fff; padding: 12px 24px; border-radius: 12px; font-family: var(--font-ui); font-weight: 600;
-    cursor: pointer; backdrop-filter: var(--glass-blur); transition: 0.2s; z-index: 200; text-transform: uppercase; letter-spacing: 1px; font-size: 0.85rem;
-}
-.btn-sys:hover { background: rgba(255,255,255,0.1); border-color: #fff; box-shadow: 0 0 20px rgba(255,255,255,0.1); }
+        .p1-controls { color: var(--accent-cyan); }
+        .p2-controls { color: var(--accent-pink); }
 
-#btn-exit { top: 30px; left: 30px; display: none; }
-#btn-mute { top: 30px; right: 30px; display: none; }
+        #game-canvas {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: 1;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
 
-#hud-layer { position: absolute; top: 40px; left: 50%; transform: translateX(-50%); display: flex; gap: 80px; z-index: 100; display: none; pointer-events: none; }
-.score-disp { font-family: var(--font-mono); font-size: 4rem; font-weight: 900; line-height: 1; text-shadow: 0 0 30px rgba(0,0,0,0.8); }
-#s-p1 { color: var(--color-p1); filter: drop-shadow(0 0 15px var(--color-p1-glow)); }
-#s-p2 { color: var(--color-p2); filter: drop-shadow(0 0 15px var(--color-p2-glow)); }
+        #game-canvas.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
 
-/* --- BRIEFING OVERLAY --- */
-#briefing-modal {
-    position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.9);
-    width: 800px; max-width: 90vw; background: rgba(10, 15, 25, 0.9);
-    backdrop-filter: blur(40px); border: 1px solid rgba(255,255,255,0.1); border-radius: 24px;
-    padding: 50px; z-index: 300; display: none; opacity: 0;
-    box-shadow: 0 40px 100px rgba(0,0,0,0.8), inset 0 0 0 1px rgba(255,255,255,0.05);
-    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-}
+        #overlay {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.8);
+            backdrop-filter: blur(5px);
+            z-index: 20;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
 
-#briefing-modal.active { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+        #overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
 
-.modal-header { text-align: center; margin-bottom: 40px; }
-.modal-title { font-size: 2.8rem; color: #fff; font-weight: 900; letter-spacing: -1px; margin-bottom: 15px; text-transform: uppercase; }
-.modal-desc { color: var(--color-text-dim); font-size: 1.15rem; line-height: 1.6; max-width: 600px; margin: 0 auto; }
+        #overlay-title {
+            font-size: 48px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            text-align: center;
+            text-shadow: 0 0 20px var(--accent-cyan);
+        }
 
-.controls-container { display: flex; gap: 40px; margin-bottom: 50px; }
-.ctrl-panel { flex: 1; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.05); border-radius: 16px; padding: 30px; text-align: center; }
+        #overlay-rules {
+            font-size: 18px;
+            color: #ddd;
+            margin-bottom: 40px;
+            text-align: center;
+            max-width: 600px;
+        }
 
-.ctrl-p1 h4 { color: var(--color-p1); margin-bottom: 25px; font-size: 1.3rem; text-transform: uppercase; letter-spacing: 2px; }
-.ctrl-p2 h4 { color: var(--color-p2); margin-bottom: 25px; font-size: 1.3rem; text-transform: uppercase; letter-spacing: 2px; }
+        .btn {
+            background: transparent;
+            border: 2px solid var(--accent-cyan);
+            color: var(--accent-cyan);
+            padding: 12px 30px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
 
-.key-grid { display: grid; grid-template-columns: repeat(3, 45px); gap: 10px; justify-content: center; margin-bottom: 25px; }
-.k-btn {
-    width: 45px; height: 45px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
-    border-bottom: 4px solid rgba(255,255,255,0.2); border-radius: 10px;
-    display: flex; align-items: center; justify-content: center; font-family: var(--font-mono); font-weight: bold; color: #fff; font-size: 1.1rem;
-}
-.k-empty { background: transparent; border: none; }
-.k-wide { grid-column: span 3; width: 100%; }
+        .btn:hover {
+            background: var(--accent-cyan);
+            color: #000;
+            box-shadow: 0 0 20px rgba(0, 243, 255, 0.5);
+        }
 
-.k-action { font-size: 0.9rem; color: var(--color-text-dim); text-transform: uppercase; letter-spacing: 1.5px; }
+        #btn-back {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            z-index: 30;
+            border-color: #888;
+            color: #888;
+            padding: 8px 16px;
+            font-size: 12px;
+            display: none;
+        }
 
-.btn-launch {
-    display: block; width: 100%; padding: 20px;
-    background: linear-gradient(90deg, rgba(0, 243, 255, 0.15), rgba(255, 0, 85, 0.15));
-    border: 1px solid rgba(255,255,255,0.3); color: #fff; border-radius: 16px;
-    font-size: 1.4rem; font-weight: 800; text-transform: uppercase; letter-spacing: 4px; cursor: pointer; transition: all 0.3s ease;
-}
-.btn-launch:hover { background: linear-gradient(90deg, rgba(0, 243, 255, 0.4), rgba(255, 0, 85, 0.4)); border-color: #fff; box-shadow: 0 0 40px rgba(255,255,255,0.1); transform: translateY(-3px); }
+        #btn-back:hover {
+            background: #888;
+            color: #000;
+            box-shadow: none;
+        }
 
-/* Scanlines & CRT Effects */
-.scanlines { position: fixed; inset: 0; background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0) 50%, rgba(0,0,0,0.1) 50%, rgba(0,0,0,0.1)); background-size: 100% 4px; pointer-events: none; z-index: 999; opacity: 0.3; }
-</style>
+        #btn-back.active {
+            display: block;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.4); }
+
+    </style>
 </head>
 <body>
 
-<div id="app-container">
-    <div class="scanlines"></div>
+<div id="console-container">
+    <header>
+        <h1>Multiplayer Wars</h1>
+        <div id="status-bar">
+            <span id="fps-counter">FPS: 60</span>
+            <span>SYSTEM ON</span>
+        </div>
+    </header>
     
-    <div id="dashboard">
-        <div class="header-banner">
-            <h1>Multiplayer Wars</h1>
-            <p>Advanced Competitive Operations Hub. Library: 50 Modules. Status: Online.</p>
-        </div>
-        <div class="grid-viewport">
-            <div class="module-grid" id="m-grid"></div>
-        </div>
-    </div>
+    <button id="btn-back" class="btn">Return to Hub</button>
 
-    <div id="engine-viewport">
-        <canvas id="r-canvas"></canvas>
-        <button class="btn-sys" id="btn-exit">⟵ Abort</button>
-        <button class="btn-sys" id="btn-mute">Audio: ON</button>
-        <div id="hud-layer">
-            <div class="score-disp" id="s-p1">0</div>
-            <div class="score-disp" id="s-p2">0</div>
+    <div id="main-display">
+        <div id="menu-screen"></div>
+        <canvas id="game-canvas"></canvas>
+        <div id="overlay">
+            <div id="overlay-title">GAME TITLE</div>
+            <div id="overlay-rules">Win conditions and rules go here.</div>
+            <button id="btn-start" class="btn">Initialize Match</button>
         </div>
-    </div>
-
-    <div id="briefing-modal">
-        <div class="modal-header">
-            <div class="modal-title" id="b-title">INITIATING...</div>
-            <div class="modal-desc" id="b-desc">Awaiting parameters...</div>
-        </div>
-        <div class="controls-container">
-            <div class="ctrl-panel ctrl-p1">
-                <h4>Player 1</h4>
-                <div class="key-grid" id="b-k1"></div>
-                <div class="k-action" id="b-a1">ACTION</div>
-            </div>
-            <div class="ctrl-panel ctrl-p2">
-                <h4>Player 2</h4>
-                <div class="key-grid" id="b-k2"></div>
-                <div class="k-action" id="b-a2">ACTION</div>
-            </div>
-        </div>
-        <button class="btn-launch" id="btn-launch">Engage Simulation</button>
     </div>
 </div>
 
 <script>
 /**
- * =========================================================================================
- * MULTIPLAYER WARS: ADVANCED ENGINE CODEBASE (2500+ Lines Equivalent Density)
- * Features: custom math physics, spatial partitioning, procedural audio synthesis,
- * advanced particle emitters, and 50 robust game states.
- * =========================================================================================
+ * MULTIPLAYER WARS - CORE ENGINE & PHYSICS ARCHITECTURE
  */
 
-// --- 1. CORE MATHEMATICS & GEOMETRY ----------------------------------------------------
-class Vec2 {
-    constructor(x=0, y=0) { this.x = x; this.y = y; }
-    set(x,y) { this.x=x; this.y=y; return this; }
-    clone() { return new Vec2(this.x, this.y); }
-    add(v) { this.x+=v.x; this.y+=v.y; return this; }
-    sub(v) { this.x-=v.x; this.y-=v.y; return this; }
-    mul(s) { this.x*=s; this.y*=s; return this; }
-    div(s) { if(s!==0){this.x/=s; this.y/=s;} return this; }
-    magSq() { return this.x*this.x + this.y*this.y; }
-    mag() { return Math.sqrt(this.magSq()); }
-    norm() { let m = this.mag(); if(m>0) this.div(m); return this; }
-    dot(v) { return this.x*v.x + this.y*v.y; }
-    cross(v) { return this.x*v.y - this.y*v.x; }
-    distSq(v) { let dx=this.x-v.x, dy=this.y-v.y; return dx*dx+dy*dy; }
-    dist(v) { return Math.sqrt(this.distSq(v)); }
-    limit(max) { if(this.magSq() > max*max){ this.norm().mul(max); } return this; }
+// Math & Vector Operations
+class Vector2 {
+    constructor(x = 0, y = 0) { this.x = x; this.y = y; }
+    add(v) { this.x += v.x; this.y += v.y; return this; }
+    sub(v) { this.x -= v.x; this.y -= v.y; return this; }
+    mult(n) { this.x *= n; this.y *= n; return this; }
+    div(n) { this.x /= n; this.y /= n; return this; }
+    mag() { return Math.sqrt(this.x * this.x + this.y * this.y); }
+    magSq() { return this.x * this.x + this.y * this.y; }
+    normalize() { let m = this.mag(); if(m !== 0) this.div(m); return this; }
+    limit(max) { if(this.magSq() > max * max) { this.normalize(); this.mult(max); } return this; }
     heading() { return Math.atan2(this.y, this.x); }
-    rotate(angle) { let c = Math.cos(angle), s = Math.sin(angle), nx = this.x*c - this.y*s, ny = this.x*s + this.y*c; this.x=nx; this.y=ny; return this; }
-    static add(a,b) { return new Vec2(a.x+b.x, a.y+b.y); }
-    static sub(a,b) { return new Vec2(a.x-b.x, a.y-b.y); }
-    static mul(v,s) { return new Vec2(v.x*s, v.y*s); }
-    static fromAngle(a, l=1) { return new Vec2(Math.cos(a)*l, Math.sin(a)*l); }
-    static random(min, max) { return new Vec2(M.rnd(min,max), M.rnd(min,max)); }
-    static randomDir() { return Vec2.fromAngle(Math.random()*Math.PI*2); }
+    copy() { return new Vector2(this.x, this.y); }
+    dist(v) { return Math.sqrt(Math.pow(this.x - v.x, 2) + Math.pow(this.y - v.y, 2)); }
+    dot(v) { return this.x * v.x + this.y * v.y; }
+    static sub(v1, v2) { return new Vector2(v1.x - v2.x, v1.y - v2.y); }
+    static add(v1, v2) { return new Vector2(v1.x + v2.x, v1.y + v2.y); }
+    static mult(v, n) { return new Vector2(v.x * n, v.y * n); }
+    static random(min, max) { return new Vector2(Math.random() * (max - min) + min, Math.random() * (max - min) + min); }
+    static fromAngle(angle, length = 1) { return new Vector2(length * Math.cos(angle), length * Math.sin(angle)); }
 }
 
-const M = {
-    PI: Math.PI, PI2: Math.PI*2,
-    rnd: (min, max) => Math.random() * (max - min) + min,
-    rndInt: (min, max) => Math.floor(Math.random() * (max - min + 1)) + min,
-    clamp: (val, min, max) => Math.max(min, Math.min(max, val)),
-    lerp: (a, b, t) => a + (b - a) * t,
-    wrap: (val, max) => (val < 0 ? val + max : (val >= max ? val - max : val)),
+const MathUtils = {
+    clamp: (val, min, max) => Math.min(Math.max(val, min), max),
+    lerp: (start, end, amt) => (1 - amt) * start + amt * end,
     map: (n, start1, stop1, start2, stop2) => ((n - start1) / (stop1 - start1)) * (stop2 - start2) + start2,
-    // Separating Axis Theorem Collision (Polygons)
-    satIntersect: (poly1, poly2) => {
-        let polys = [poly1, poly2];
-        let overlap = Infinity; let smallestAxis = null;
-        for (let i = 0; i < polys.length; i++) {
-            let poly = polys[i];
-            for (let j = 0; j < poly.pts.length; j++) {
-                let p1 = poly.pts[j]; let p2 = poly.pts[(j + 1) % poly.pts.length];
-                let edge = Vec2.sub(p2, p1); let axis = new Vec2(-edge.y, edge.x).norm();
-                let [minA, maxA] = M.satProject(poly1, axis);
-                let [minB, maxB] = M.satProject(poly2, axis);
-                if (minA >= maxB || minB >= maxA) return false;
-                let o = Math.min(maxA, maxB) - Math.max(minA, minB);
-                if (o < overlap) { overlap = o; smallestAxis = axis; }
-            }
+    random: (min, max) => Math.random() * (max - min) + min,
+    circleCollision: (c1, c2) => {
+        let distSq = Math.pow(c1.pos.x - c2.pos.x, 2) + Math.pow(c1.pos.y - c2.pos.y, 2);
+        return distSq <= Math.pow(c1.radius + c2.radius, 2);
+    },
+    rectCollision: (r1, r2) => {
+        return r1.pos.x < r2.pos.x + r2.width && r1.pos.x + r1.width > r2.pos.x &&
+               r1.pos.y < r2.pos.y + r2.height && r1.pos.y + r1.height > r2.pos.y;
+    },
+    resolveElasticCollision: (p1, p2) => {
+        const xVelocityDiff = p1.vel.x - p2.vel.x;
+        const yVelocityDiff = p1.vel.y - p2.vel.y;
+        const xDist = p2.pos.x - p1.pos.x;
+        const yDist = p2.pos.y - p1.pos.y;
+        if (xVelocityDiff * xDist + yVelocityDiff * yDist >= 0) {
+            const angle = -Math.atan2(p2.pos.y - p1.pos.y, p2.pos.x - p1.pos.x);
+            const m1 = p1.mass || 1; const m2 = p2.mass || 1;
+            const u1 = { x: p1.vel.x * Math.cos(angle) - p1.vel.y * Math.sin(angle), y: p1.vel.x * Math.sin(angle) + p1.vel.y * Math.cos(angle) };
+            const u2 = { x: p2.vel.x * Math.cos(angle) - p2.vel.y * Math.sin(angle), y: p2.vel.x * Math.sin(angle) + p2.vel.y * Math.cos(angle) };
+            const v1 = { x: u1.x * (m1 - m2) / (m1 + m2) + u2.x * 2 * m2 / (m1 + m2), y: u1.y };
+            const v2 = { x: u2.x * (m1 - m2) / (m1 + m2) + u1.x * 2 * m2 / (m1 + m2), y: u2.y };
+            p1.vel.x = v1.x * Math.cos(-angle) - v1.y * Math.sin(-angle);
+            p1.vel.y = v1.x * Math.sin(-angle) + v1.y * Math.cos(-angle);
+            p2.vel.x = v2.x * Math.cos(-angle) - v2.y * Math.sin(-angle);
+            p2.vel.y = v2.x * Math.sin(-angle) + v2.y * Math.cos(-angle);
         }
-        let d = Vec2.sub(poly2.pos, poly1.pos);
-        if (d.dot(smallestAxis) < 0) smallestAxis.mul(-1);
-        return { axis: smallestAxis, overlap: overlap };
-    },
-    satProject: (poly, axis) => {
-        let min = Infinity; let max = -Infinity;
-        for (let p of poly.pts) {
-            let dot = p.dot(axis);
-            min = Math.min(min, dot); max = Math.max(max, dot);
-        }
-        return [min, max];
-    },
-    circIntersect: (c1, c2) => {
-        let dSq = c1.pos.distSq(c2.pos);
-        let rSum = c1.r + c2.r;
-        if(dSq < rSum*rSum) {
-            let d = Math.sqrt(dSq); let overlap = rSum - d;
-            let axis = d===0 ? new Vec2(1,0) : Vec2.sub(c2.pos, c1.pos).div(d);
-            return { axis: axis, overlap: overlap };
-        } return false;
-    },
-    rectIntersect: (r1, r2) => !(r2.x > r1.x+r1.w || r2.x+r2.w < r1.x || r2.y > r1.y+r1.h || r2.y+r2.h < r1.y)
+    }
 };
 
-// --- 2. PROCEDURAL AUDIO SYNTHESIZER ----------------------------------------------------
-class AudioEngine {
-    constructor() { this.ctx = new (window.AudioContext || window.webkitAudioContext)(); this.muted = false; this.master = this.ctx.createGain(); this.master.gain.value = 0.3; this.master.connect(this.ctx.destination); }
-    playTone(freq, type, dur, vol=1) { if(this.muted || this.ctx.state !== 'running') return;
-        let osc = this.ctx.createOscillator(); let g = this.ctx.createGain();
-        osc.type = type; osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
-        g.gain.setValueAtTime(vol, this.ctx.currentTime); g.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + dur);
-        osc.connect(g); g.connect(this.master); osc.start(); osc.stop(this.ctx.currentTime + dur);
-    }
-    sfxShoot() { this.playTone(M.rnd(600, 800), 'square', 0.1, 0.5); this.playTone(M.rnd(300, 400), 'sawtooth', 0.15, 0.3); }
-    sfxExplode() { if(this.muted) return;
-        let bLen = this.ctx.sampleRate * 0.5; let buf = this.ctx.createBuffer(1, bLen, this.ctx.sampleRate); let data = buf.getChannelData(0);
-        for(let i=0; i<bLen; i++) data[i] = Math.random()*2-1;
-        let noise = this.ctx.createBufferSource(); noise.buffer = buf;
-        let filter = this.ctx.createBiquadFilter(); filter.type = 'lowpass'; filter.frequency.value = 1000;
-        let g = this.ctx.createGain(); g.gain.setValueAtTime(1, this.ctx.currentTime); g.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.5);
-        noise.connect(filter); filter.connect(g); g.connect(this.master); noise.start();
-    }
-    sfxHit() { this.playTone(150, 'triangle', 0.1, 1.0); }
-    sfxScore() { this.playTone(800, 'sine', 0.1, 0.5); setTimeout(()=>this.playTone(1200, 'sine', 0.2, 0.5), 100); }
-    sfxBounce() { this.playTone(M.rnd(400,450), 'sine', 0.1, 0.5); }
-    toggleMute() { this.muted = !this.muted; return this.muted; }
-    resume() { if(this.ctx.state === 'suspended') this.ctx.resume(); }
-}
-const Audio = new AudioEngine();
-
-// --- 3. INPUT MANAGEMENT ----------------------------------------------------
+// Input Manager
 class InputManager {
-    constructor() { this.keys = {}; this.prev = {}; this.binds = { P1_U: 'KeyW', P1_D: 'KeyS', P1_L: 'KeyA', P1_R: 'KeyD', P1_A1: 'Space', P1_A2: 'ShiftLeft', P2_U: 'ArrowUp', P2_D: 'ArrowDown', P2_L: 'ArrowLeft', P2_R: 'ArrowRight', P2_A1: 'Enter', P2_A2: 'ShiftRight' };
+    constructor() {
+        this.keys = {};
         window.addEventListener('keydown', e => this.keys[e.code] = true);
         window.addEventListener('keyup', e => this.keys[e.code] = false);
     }
-    update() { for(let k in this.keys) this.prev[k] = this.keys[k]; }
-    down(code) { return !!this.keys[code]; }
-    pressed(code) { return !!this.keys[code] && !this.prev[code]; }
-    p1Dir() { let v = new Vec2(0,0); if(this.down(this.binds.P1_U)) v.y-=1; if(this.down(this.binds.P1_D)) v.y+=1; if(this.down(this.binds.P1_L)) v.x-=1; if(this.down(this.binds.P1_R)) v.x+=1; return v.magSq()>0 ? v.norm() : v; }
-    p2Dir() { let v = new Vec2(0,0); if(this.down(this.binds.P2_U)) v.y-=1; if(this.down(this.binds.P2_D)) v.y+=1; if(this.down(this.binds.P2_L)) v.x-=1; if(this.down(this.binds.P2_R)) v.x+=1; return v.magSq()>0 ? v.norm() : v; }
+    isDown(code) { return this.keys[code] === true; }
 }
-const Input = new InputManager();
 
-// --- 4. ADVANCED PARTICLE & FX SYSTEM ----------------------------------------------------
+// Particle System
 class Particle {
-    constructor(p, v, life, col, size, t) { this.p=p; this.v=v; this.life=life; this.maxLife=life; this.col=col; this.s=size; this.t=t; this.f=0.95; }
-    update(dt) { this.p.add(Vec2.mul(this.v, dt*60)); if(this.t==='spark' || this.t==='dust') this.v.mul(this.f); this.life -= dt; }
+    constructor(x, y, vx, vy, life, color, size) {
+        this.pos = new Vector2(x, y);
+        this.vel = new Vector2(vx, vy);
+        this.life = life;
+        this.maxLife = life;
+        this.color = color;
+        this.size = size;
+        this.alpha = 1;
+        this.friction = 0.95;
+    }
+    update(dt) {
+        this.vel.mult(this.friction);
+        this.pos.add(Vector2.mult(this.vel, dt * 60));
+        this.life -= dt;
+        this.alpha = Math.max(0, this.life / this.maxLife);
+    }
     draw(ctx) {
-        let a = Math.max(0, this.life/this.maxLife); ctx.globalAlpha = a; ctx.fillStyle = this.col;
-        if(this.t === 'spark') { ctx.beginPath(); let h=this.v.heading(); let l=this.v.mag()*0.4+this.s; ctx.ellipse(this.p.x, this.p.y, l, this.s*0.5, h, 0, M.PI2); ctx.fill(); }
-        else if(this.t === 'glow') { ctx.shadowBlur=15; ctx.shadowColor=this.col; ctx.beginPath(); ctx.arc(this.p.x, this.p.y, this.s*a, 0, M.PI2); ctx.fill(); ctx.shadowBlur=0; }
-        else { ctx.fillRect(this.p.x-this.s/2, this.p.y-this.s/2, this.s, this.s); }
+        ctx.globalAlpha = this.alpha;
+        ctx.fillStyle = this.color;
+        ctx.beginPath();
+        ctx.arc(this.pos.x, this.pos.y, this.size, 0, Math.PI * 2);
+        ctx.fill();
         ctx.globalAlpha = 1;
     }
 }
-class FXManager {
-    constructor() { this.pts = []; this.shakeT = 0; this.shakeMag = 0; }
-    emit(x,y,n,col,opts={}) {
-        let spd = opts.spd||100, life=opts.life||1, size=opts.s||3, t=opts.t||'dust', spr=opts.spr||M.PI2, ang=opts.ang||0;
-        for(let i=0; i<n; i++) { let a = ang + (Math.random()-0.5)*spr; let s = M.rnd(spd*0.2, spd); this.pts.push(new Particle(new Vec2(x,y), Vec2.fromAngle(a, s/60), M.rnd(life*0.5, life), col, M.rnd(size*0.5, size*1.5), t)); }
-    }
-    shake(mag, dur) { this.shakeMag = mag; this.shakeT = dur; }
-    update(dt) { for(let i=this.pts.length-1; i>=0; i--){ this.pts[i].update(dt); if(this.pts[i].life<=0) this.pts.splice(i,1); } if(this.shakeT>0) this.shakeT-=dt; }
-    preDraw(ctx) { if(this.shakeT>0){ ctx.save(); ctx.translate(M.rnd(-this.shakeMag, this.shakeMag), M.rnd(-this.shakeMag, this.shakeMag)); } }
-    postDraw(ctx) { if(this.shakeT>0) ctx.restore(); }
-    draw(ctx) { ctx.globalCompositeOperation = 'screen'; for(let p of this.pts) p.draw(ctx); ctx.globalCompositeOperation = 'source-over'; }
-    clear() { this.pts = []; this.shakeT=0; }
-}
 
-// --- 5. BASE ENGINE ABSTRACTION ----------------------------------------------------
-class Engine {
-    constructor() {
-        this.cvs = document.getElementById('r-canvas'); this.ctx = this.cvs.getContext('2d', {alpha: false});
-        this.w = 0; this.h = 0; this.active = null; this.raf = null; this.last = 0;
-        window.addEventListener('resize', ()=>this.resize()); this.resize();
-    }
-    resize() { this.w = window.innerWidth; this.h = window.innerHeight; this.cvs.width=this.w; this.cvs.height=this.h; if(this.active) this.active.resize(this.w, this.h); }
-    start(gameClass) {
-        if(this.raf) cancelAnimationFrame(this.raf);
-        this.active = new gameClass(this.w, this.h); this.active.resetScores(); this.active.init();
-        this.last = performance.now(); this.loop = this.loop.bind(this); this.raf = requestAnimationFrame(this.loop);
-        Audio.resume();
-    }
-    stop() { if(this.raf) cancelAnimationFrame(this.raf); this.active = null; this.ctx.clearRect(0,0,this.w,this.h); }
-    loop(time) {
-        let dt = (time - this.last)/1000; if(dt>0.1) dt=0.1; this.last = time;
-        if(this.active) {
-            this.ctx.fillStyle = this.active.bgClear || 'rgba(7, 7, 15, 0.3)'; this.ctx.fillRect(0,0,this.w,this.h);
-            this.active.update(dt);
-            this.active.fx.preDraw(this.ctx);
-            this.active.draw(this.ctx);
-            this.active.fx.draw(this.ctx);
-            this.active.fx.postDraw(this.ctx);
-        }
-        Input.update(); this.raf = requestAnimationFrame(this.loop);
-    }
-}
-const Sys = new Engine();
-
-class GameModule {
-    constructor(w,h) { this.w=w; this.h=h; this.fx=new FXManager(); this.p1s=0; this.p2s=0; this.bgClear = 'rgba(7, 7, 15, 0.4)'; }
-    static meta() { return { id: 'BASE', name: 'Base', desc: '...', k1: 'wasd', a1: 'Move', k2: 'arrows', a2: 'Move' }; }
-    resize(w,h) { this.w=w; this.h=h; }
-    resetScores() { this.p1s=0; this.p2s=0; this.updHUD(); }
-    score(p) { if(p===1) this.p1s++; else this.p2s++; Audio.sfxScore(); this.updHUD(); this.fx.shake(15, 0.4); this.init(); }
-    updHUD() { document.getElementById('s-p1').innerText = this.p1s; document.getElementById('s-p2').innerText = this.p2s; }
-    init() {} update(dt) { this.fx.update(dt); } draw(ctx) {}
-}
-
-// --- 6. EXPLICIT, HIGH-FIDELITY GAME MODULES (1-15) ----------------------------------------------------
-
-/** MODULE 1: GRAVITY DOGFIGHT */
-class G_GravityDogfight extends GameModule {
-    static meta() { return { name: "Singularity Strike", desc: "Orbital vector mechanics. Destroy enemy vessel.", k1: 'wad', a1: 'Thrust/Rotate', k2: 'arrows_ulr', a2: 'Thrust/Rotate' }; }
-    init() {
-        this.bh = { p: new Vec2(this.w/2, this.h/2), m: 250000, r: 40 };
-        this.p1 = { p: new Vec2(this.w*0.1, this.h/2), v: new Vec2(0,-150), a: -M.PI/2, col: 'var(--color-p1)', cd:0 };
-        this.p2 = { p: new Vec2(this.w*0.9, this.h/2), v: new Vec2(0,150), a: M.PI/2, col: 'var(--color-p2)', cd:0 };
-        this.buls = [];
-    }
-    updShip(p, l, r, t, f, dt) {
-        if(Input.down(l)) p.a -= 4.5*dt; if(Input.down(r)) p.a += 4.5*dt;
-        let dir = Vec2.fromAngle(p.a);
-        if(Input.down(t)) { p.v.add(Vec2.mul(dir, 500*dt)); this.fx.emit(p.p.x-dir.x*15, p.p.y-dir.y*15, 1, p.col, {spd:150, life:0.2, ang:p.a+M.PI, spr:0.4, t:'spark'}); }
-        let dSq = Math.max(p.p.distSq(this.bh.p), 1000); let force = this.bh.m / dSq;
-        p.v.add(Vec2.sub(this.bh.p, p.p).norm().mul(force*dt)); p.v.mul(0.995); p.p.add(Vec2.mul(p.v, dt));
-        p.p.x = M.wrap(p.p.x, this.w); p.p.y = M.wrap(p.p.y, this.h);
-        if(p.cd>0) p.cd-=dt;
-        if(Input.pressed(f) && p.cd<=0) { Audio.sfxShoot(); this.buls.push({p: p.p.clone().add(Vec2.mul(dir,20)), v: p.v.clone().add(Vec2.mul(dir,600)), col: p.col, own: p, l: 2}); p.cd=0.3; }
-    }
-    update(dt) {
-        super.update(dt);
-        this.updShip(this.p1, 'KeyA', 'KeyD', 'KeyW', 'Space', dt);
-        this.updShip(this.p2, 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'Enter', dt);
-        for(let i=this.buls.length-1; i>=0; i--) {
-            let b = this.buls[i]; b.p.add(Vec2.mul(b.v, dt)); b.p.x=M.wrap(b.p.x, this.w); b.p.y=M.wrap(b.p.y, this.h); b.l-=dt;
-            let tar = b.own===this.p1?this.p2:this.p1;
-            if(b.p.distSq(tar.p) < 225) { Audio.sfxExplode(); this.fx.emit(tar.p.x, tar.p.y, 40, tar.col, {spd:300, life:1, t:'spark'}); this.score(b.own===this.p1?1:2); return; }
-            if(b.p.distSq(this.bh.p) < this.bh.r*this.bh.r || b.l<=0) { this.buls.splice(i,1); }
-        }
-        if(this.p1.p.distSq(this.bh.p) < this.bh.r*this.bh.r) { Audio.sfxExplode(); this.score(2); }
-        if(this.p2.p.distSq(this.bh.p) < this.bh.r*this.bh.r) { Audio.sfxExplode(); this.score(1); }
-    }
-    draw(ctx) {
-        ctx.shadowBlur=30; ctx.shadowColor='#fff'; ctx.fillStyle='#000'; ctx.strokeStyle='#fff'; ctx.lineWidth=2;
-        ctx.beginPath(); ctx.arc(this.bh.p.x, this.bh.p.y, this.bh.r, 0, M.PI2); ctx.fill(); ctx.stroke(); ctx.shadowBlur=0;
-        const dS = (p) => { ctx.save(); ctx.translate(p.p.x, p.p.y); ctx.rotate(p.a); ctx.strokeStyle=p.col; ctx.shadowBlur=15; ctx.shadowColor=p.col; ctx.beginPath(); ctx.moveTo(15,0); ctx.lineTo(-10,10); ctx.lineTo(-5,0); ctx.lineTo(-10,-10); ctx.closePath(); ctx.stroke(); ctx.restore(); };
-        dS(this.p1); dS(this.p2);
-        for(let b of this.buls) { ctx.fillStyle=b.col; ctx.beginPath(); ctx.arc(b.p.x, b.p.y, 3, 0, M.PI2); ctx.fill(); }
-    }
-}
-
-/** MODULE 2: NEON RICOCHET PONG */
-class G_NeonPong extends GameModule {
-    static meta() { return { name: "Kinetic Deflection", desc: "High-velocity core interception. Survive.", k1: 'ws', a1: 'Vertical', k2: 'arrows_ud', a2: 'Vertical' }; }
-    init() {
-        this.p1 = { y: this.h/2, w: 20, h: 120, col: 'var(--color-p1)', s: 800 };
-        this.p2 = { y: this.h/2, w: 20, h: 120, col: 'var(--color-p2)', s: 800 };
-        this.ball = { p: new Vec2(this.w/2, this.h/2), v: new Vec2((Math.random()>0.5?1:-1)*600, M.rnd(-300,300)), r: 12 };
-    }
-    update(dt) {
-        super.update(dt);
-        if(Input.down('KeyW')) this.p1.y -= this.p1.s*dt; if(Input.down('KeyS')) this.p1.y += this.p1.s*dt;
-        if(Input.down('ArrowUp')) this.p2.y -= this.p2.s*dt; if(Input.down('ArrowDown')) this.p2.y += this.p2.s*dt;
-        this.p1.y = M.clamp(this.p1.y, this.p1.h/2, this.h-this.p1.h/2); this.p2.y = M.clamp(this.p2.y, this.p2.h/2, this.h-this.p2.h/2);
-        this.ball.p.add(Vec2.mul(this.ball.v, dt));
-        if(this.ball.p.y <= this.ball.r || this.ball.p.y >= this.h-this.ball.r) { this.ball.v.y*=-1; Audio.sfxBounce(); this.fx.emit(this.ball.p.x, this.ball.p.y, 10, '#fff'); }
-        let r1 = {x: 40, y: this.p1.y-this.p1.h/2, w: this.p1.w, h: this.p1.h};
-        let r2 = {x: this.w-40-this.p2.w, y: this.p2.y-this.p2.h/2, w: this.p2.w, h: this.p2.h};
-        let br = {x: this.ball.p.x-this.ball.r, y: this.ball.p.y-this.ball.r, w: this.ball.r*2, h: this.ball.r*2};
-        if(this.ball.v.x<0 && M.rectIntersect(br, r1)) { Audio.sfxHit(); this.ball.v.x = Math.abs(this.ball.v.x)*1.05; this.ball.v.y += (this.ball.p.y - this.p1.y)*4; this.ball.p.x = r1.x+r1.w+this.ball.r; this.fx.emit(this.ball.p.x, this.ball.p.y, 20, this.p1.col, {spd:200, t:'spark'}); this.fx.shake(4,0.1); }
-        if(this.ball.v.x>0 && M.rectIntersect(br, r2)) { Audio.sfxHit(); this.ball.v.x = -Math.abs(this.ball.v.x)*1.05; this.ball.v.y += (this.ball.p.y - this.p2.y)*4; this.ball.p.x = r2.x-this.ball.r; this.fx.emit(this.ball.p.x, this.ball.p.y, 20, this.p2.col, {spd:200, t:'spark'}); this.fx.shake(4,0.1); }
-        if(this.ball.p.x<0) this.score(2); if(this.ball.p.x>this.w) this.score(1);
-    }
-    draw(ctx) {
-        ctx.fillStyle = 'rgba(255,255,255,0.05)'; for(let i=0; i<this.h; i+=40) ctx.fillRect(this.w/2-2, i, 4, 20);
-        ctx.shadowBlur=20; ctx.fillStyle=this.p1.col; ctx.shadowColor=this.p1.col; ctx.fillRect(40, this.p1.y-this.p1.h/2, this.p1.w, this.p1.h);
-        ctx.fillStyle=this.p2.col; ctx.shadowColor=this.p2.col; ctx.fillRect(this.w-40-this.p2.w, this.p2.y-this.p2.h/2, this.p2.w, this.p2.h);
-        ctx.fillStyle='#fff'; ctx.shadowColor='#fff'; ctx.beginPath(); ctx.arc(this.ball.p.x, this.ball.p.y, this.ball.r, 0, M.PI2); ctx.fill(); ctx.shadowBlur=0;
-    }
-}
-
-/** MODULE 3: ELASTIC SUMO */
-class G_SumoCollision extends GameModule {
-    static meta() { return { name: "Momentum Ring", desc: "Elastic collision combat. Force opponent out.", k1: 'wasd', a1: 'Omni-Drive', k2: 'arrows', a2: 'Omni-Drive' }; }
-    init() {
-        this.r = Math.min(this.w, this.h)*0.45; this.cp = new Vec2(this.w/2, this.h/2);
-        this.p1 = { p: new Vec2(this.w/2-150, this.h/2), v: new Vec2(0,0), r: 35, m: 1, col: 'var(--color-p1)' };
-        this.p2 = { p: new Vec2(this.w/2+150, this.h/2), v: new Vec2(0,0), r: 35, m: 1, col: 'var(--color-p2)' };
-    }
-    update(dt) {
-        super.update(dt); this.r -= dt*5;
-        this.p1.v.add(Input.p1Dir().mul(1800*dt)); this.p2.v.add(Input.p2Dir().mul(1800*dt));
-        this.p1.v.mul(0.93); this.p2.v.mul(0.93);
-        this.p1.p.add(Vec2.mul(this.p1.v, dt)); this.p2.p.add(Vec2.mul(this.p2.v, dt));
-        let cRes = M.circIntersect(this.p1, this.p2);
-        if(cRes) {
-            Audio.sfxHit(); this.fx.shake(5,0.2);
-            let n = cRes.axis; let relV = Vec2.sub(this.p2.v, this.p1.v); let spd = relV.dot(n);
-            if(spd < 0) {
-                let j = -(1+1.5)*spd / (1/this.p1.m + 1/this.p2.m); let imp = Vec2.mul(n, j);
-                this.p1.v.sub(Vec2.mul(imp, 1/this.p1.m)); this.p2.v.add(Vec2.mul(imp, 1/this.p2.m));
-                let corr = Vec2.mul(n, cRes.overlap/2); this.p1.p.sub(corr); this.p2.p.add(corr);
-                this.fx.emit(this.p1.p.x+n.x*this.p1.r, this.p1.p.y+n.y*this.p1.r, 20, '#fff', {spd:300});
-            }
-        }
-        if(this.p1.p.distSq(this.cp) > this.r*this.r) this.score(2);
-        if(this.p2.p.distSq(this.cp) > this.r*this.r) this.score(1);
-    }
-    draw(ctx) {
-        ctx.strokeStyle = 'rgba(255,255,255,0.1)'; ctx.lineWidth = 10; ctx.beginPath(); ctx.arc(this.cp.x, this.cp.y, this.r, 0, M.PI2); ctx.stroke();
-        ctx.shadowBlur=20; ctx.fillStyle=this.p1.col; ctx.shadowColor=this.p1.col; ctx.beginPath(); ctx.arc(this.p1.p.x, this.p1.p.y, this.p1.r, 0, M.PI2); ctx.fill();
-        ctx.fillStyle=this.p2.col; ctx.shadowColor=this.p2.col; ctx.beginPath(); ctx.arc(this.p2.p.x, this.p2.p.y, this.p2.r, 0, M.PI2); ctx.fill(); ctx.shadowBlur=0;
-    }
-}
-
-/** MODULE 4: CONTINUOUS LIGHTCYCLES */
-class G_Lightcycles extends GameModule {
-    static meta() { return { name: "Photon Trails", desc: "Trap enemy in exhaust. Avoid walls.", k1: 'ad', a1: 'Turn L/R', k2: 'arrows_lr', a2: 'Turn L/R' }; }
-    init() {
-        this.bgClear = 'rgba(0,0,0,0.1)'; // Long trails
-        this.p1 = { p: new Vec2(this.w*0.2, this.h*0.8), a: -M.PI/4, tr: [], s: 350, col: 'var(--color-p1)' };
-        this.p2 = { p: new Vec2(this.w*0.8, this.h*0.2), a: M.PI-M.PI/4, tr: [], s: 350, col: 'var(--color-p2)' };
-    }
-    chkLine(h, tr) {
-        for(let i=0; i<tr.length-1; i++) {
-            let p1=tr[i], p2=tr[i+1]; let l2 = p1.distSq(p2); if(l2===0) continue;
-            let t = Math.max(0, Math.min(1, ((h.x-p1.x)*(p2.x-p1.x) + (h.y-p1.y)*(p2.y-p1.y)) / l2));
-            let proj = new Vec2(p1.x + t*(p2.x-p1.x), p1.y + t*(p2.y-p1.y));
-            if(h.distSq(proj) < 25) return true;
-        } return false;
-    }
-    update(dt) {
-        super.update(dt); let ts = 4.5;
-        if(Input.down('KeyA')) this.p1.a -= ts*dt; if(Input.down('KeyD')) this.p1.a += ts*dt;
-        if(Input.down('ArrowLeft')) this.p2.a -= ts*dt; if(Input.down('ArrowRight')) this.p2.a += ts*dt;
-        this.p1.tr.push(this.p1.p.clone()); this.p2.tr.push(this.p2.p.clone());
-        if(this.p1.tr.length>250) this.p1.tr.shift(); if(this.p2.tr.length>250) this.p2.tr.shift();
-        this.p1.p.add(Vec2.fromAngle(this.p1.a, this.p1.s*dt)); this.p2.p.add(Vec2.fromAngle(this.p2.a, this.p2.s*dt));
-        let bnd = p => p.x<0||p.x>this.w||p.y<0||p.y>this.h;
-        let d1 = bnd(this.p1.p) || this.chkLine(this.p1.p, this.p2.tr) || this.chkLine(this.p1.p, this.p1.tr.slice(0,-15));
-        let d2 = bnd(this.p2.p) || this.chkLine(this.p2.p, this.p1.tr) || this.chkLine(this.p2.p, this.p2.tr.slice(0,-15));
-        if(d1 && !d2) { Audio.sfxExplode(); this.score(2); } else if(d2 && !d1) { Audio.sfxExplode(); this.score(1); } else if(d1 && d2) this.init();
-    }
-    draw(ctx) {
-        const dT = p => {
-            if(p.tr.length<2) return; ctx.strokeStyle=p.col; ctx.lineWidth=6; ctx.shadowBlur=15; ctx.shadowColor=p.col; ctx.lineCap='round'; ctx.lineJoin='round';
-            ctx.beginPath(); ctx.moveTo(p.tr[0].x, p.tr[0].y); for(let i=1;i<p.tr.length;i++) ctx.lineTo(p.tr[i].x, p.tr[i].y); ctx.stroke();
-            ctx.fillStyle='#fff'; ctx.beginPath(); ctx.arc(p.p.x, p.p.y, 4, 0, M.PI2); ctx.fill();
-        }; dT(this.p1); dT(this.p2); ctx.shadowBlur=0;
-    }
-}
-
-/** MODULE 5: BULLET HELL SURVIVAL */
-class G_BulletHell extends GameModule {
-    static meta() { return { name: "Barrage Core", desc: "Dodge the central emitter. Outlast.", k1: 'wasd', a1: 'Evasion', k2: 'arrows', a2: 'Evasion' }; }
-    init() {
-        this.p1 = { p: new Vec2(this.w*0.25, this.h*0.8), r: 8, col: 'var(--color-p1)' };
-        this.p2 = { p: new Vec2(this.w*0.75, this.h*0.8), r: 8, col: 'var(--color-p2)' };
-        this.buls = []; this.t = 0; this.ba = 0;
-    }
-    update(dt) {
-        super.update(dt);
-        this.p1.p.add(Input.p1Dir().mul(450*dt)); this.p2.p.add(Input.p2Dir().mul(450*dt));
-        let b = p => { p.p.x=M.clamp(p.p.x,10,this.w-10); p.p.y=M.clamp(p.p.y,10,this.h-10); }; b(this.p1); b(this.p2);
-        this.t+=dt; this.ba+=dt*2.5;
-        if(this.t>0.04) {
-            this.t=0; let cp=new Vec2(this.w/2, this.h*0.2);
-            this.buls.push({ p:cp.clone(), v:Vec2.fromAngle(this.ba, 350), r:5, c:'#fff' });
-            this.buls.push({ p:cp.clone(), v:Vec2.fromAngle(this.ba+M.PI, 350), r:5, c:'#fff' });
-            if(Math.random()<0.08) { for(let i=0;i<12;i++) this.buls.push({ p:cp.clone(), v:Vec2.fromAngle(M.PI2/12*i, 200), r:7, c:'#ffeb3b' }); Audio.sfxShoot(); }
-        }
-        for(let i=this.buls.length-1; i>=0; i--) {
-            let bl = this.buls[i]; bl.p.add(Vec2.mul(bl.v, dt));
-            if(bl.p.x<0||bl.p.x>this.w||bl.p.y<0||bl.p.y>this.h) { this.buls.splice(i,1); continue; }
-            if(bl.p.distSq(this.p1.p) < Math.pow(bl.r+this.p1.r, 2)) { Audio.sfxExplode(); this.score(2); return; }
-            if(bl.p.distSq(this.p2.p) < Math.pow(bl.r+this.p2.r, 2)) { Audio.sfxExplode(); this.score(1); return; }
-        }
-    }
-    draw(ctx) {
-        ctx.fillStyle='#b200ff'; ctx.shadowBlur=40; ctx.shadowColor='#b200ff'; ctx.beginPath(); ctx.arc(this.w/2, this.h*0.2, 50, 0, M.PI2); ctx.fill();
-        ctx.shadowBlur=15; ctx.fillStyle=this.p1.col; ctx.shadowColor=this.p1.col; ctx.beginPath(); ctx.arc(this.p1.p.x, this.p1.p.y, this.p1.r, 0, M.PI2); ctx.fill();
-        ctx.fillStyle=this.p2.col; ctx.shadowColor=this.p2.col; ctx.beginPath(); ctx.arc(this.p2.p.x, this.p2.p.y, this.p2.r, 0, M.PI2); ctx.fill();
-        ctx.shadowBlur=0; for(let bl of this.buls) { ctx.fillStyle=bl.c; ctx.beginPath(); ctx.arc(bl.p.x, bl.p.y, bl.r, 0, M.PI2); ctx.fill(); }
-    }
-}
-
-/** MODULE 6: TANK ARTILLERY */
-class G_Artillery extends GameModule {
-    static meta() { return { name: "Ballistic Arc", desc: "Calculate trajectory. Destroy enemy.", k1: 'wad', a1: 'Aim/Power/Fire', k2: 'arrows_ulr', a2: 'Aim/Power/Fire' }; }
-    init() {
-        this.p1 = { p: new Vec2(this.w*0.15, this.h-50), a: -M.PI/4, pow: 0, chrg: false, col: 'var(--color-p1)' };
-        this.p2 = { p: new Vec2(this.w*0.85, this.h-50), a: -M.PI*0.75, pow: 0, chrg: false, col: 'var(--color-p2)' };
-        this.buls = []; this.g = new Vec2(0, 900);
-    }
-    updTank(p, l, r, aim, fire, dt) {
-        if(Input.down(l)) p.a -= 2*dt; if(Input.down(r)) p.a += 2*dt;
-        p.a = M.clamp(p.a, -M.PI, 0);
-        if(Input.down(aim)) { p.chrg = true; p.pow += 1000*dt; if(p.pow>1500) p.pow=1500; }
-        else if(p.chrg) {
-            Audio.sfxShoot(); this.buls.push({ p: p.p.clone().add(new Vec2(0,-15)), v: Vec2.fromAngle(p.a, p.pow), col: p.col, own: p });
-            this.fx.emit(p.p.x, p.p.y-15, 20, '#fff', {spd:200, t:'spark'}); p.chrg=false; p.pow=0;
+class ParticleManager {
+    constructor() { this.particles = []; }
+    emit(x, y, count, color, speedScale = 1, sizeScale = 1) {
+        for(let i=0; i<count; i++) {
+            let angle = Math.random() * Math.PI * 2;
+            let speed = Math.random() * 5 * speedScale;
+            this.particles.push(new Particle(
+                x, y, 
+                Math.cos(angle)*speed, Math.sin(angle)*speed, 
+                Math.random() * 0.5 + 0.2, 
+                color, 
+                Math.random() * 3 * sizeScale + 1
+            ));
         }
     }
     update(dt) {
-        super.update(dt);
-        this.updTank(this.p1, 'KeyA', 'KeyD', 'KeyW', 'Space', dt);
-        this.updTank(this.p2, 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'Enter', dt);
-        for(let i=this.buls.length-1; i>=0; i--) {
-            let b = this.buls[i]; b.v.add(Vec2.mul(this.g, dt)); b.p.add(Vec2.mul(b.v, dt));
-            if(b.p.y > this.h) { this.fx.emit(b.p.x, this.h, 30, '#aaa', {ang:-M.PI/2, spr:M.PI}); this.buls.splice(i,1); Audio.sfxHit(); continue; }
-            let tar = b.own===this.p1 ? this.p2 : this.p1;
-            if(b.p.distSq(tar.p) < 900) { Audio.sfxExplode(); this.fx.emit(tar.p.x, tar.p.y, 50, tar.col, {spd:400, t:'spark'}); this.score(b.own===this.p1?1:2); return; }
+        for (let i = this.particles.length - 1; i >= 0; i--) {
+            this.particles[i].update(dt);
+            if (this.particles[i].life <= 0) this.particles.splice(i, 1);
         }
     }
     draw(ctx) {
-        ctx.fillStyle = '#223'; ctx.fillRect(0, this.h-40, this.w, 40);
-        const dT = p => {
-            ctx.fillStyle=p.col; ctx.fillRect(p.p.x-20, p.p.y-10, 40, 20); ctx.beginPath(); ctx.arc(p.p.x, p.p.y-10, 15, 0, M.PI, true); ctx.fill();
-            ctx.strokeStyle=p.col; ctx.lineWidth=6; ctx.beginPath(); ctx.moveTo(p.p.x, p.p.y-10); ctx.lineTo(p.p.x+Math.cos(p.a)*30, p.p.y-10+Math.sin(p.a)*30); ctx.stroke();
-            if(p.chrg) { ctx.fillStyle='#fff'; ctx.fillRect(p.p.x-20, p.p.y+15, (p.pow/1500)*40, 5); }
-        }; dT(this.p1); dT(this.p2);
-        for(let b of this.buls) { ctx.fillStyle=b.col; ctx.beginPath(); ctx.arc(b.p.x, b.p.y, 5, 0, M.PI2); ctx.fill(); }
+        this.particles.forEach(p => p.draw(ctx));
     }
+    clear() { this.particles = []; }
 }
 
-/** MODULE 7: PLATFORM BRAWLER */
-class G_PlatformBrawler extends GameModule {
-    static meta() { return { name: "Smash Vectors", desc: "Knock opponent off platform.", k1: 'wasd', a1: 'Move/Jump', k2: 'arrows', a2: 'Move/Jump' }; }
-    init() {
-        this.plat = { x: this.w*0.2, y: this.h*0.7, w: this.w*0.6, h: 40 };
-        this.p1 = { p: new Vec2(this.w*0.3, this.h*0.5), v: new Vec2(), r: 20, col: 'var(--color-p1)', gr: false };
-        this.p2 = { p: new Vec2(this.w*0.7, this.h*0.5), v: new Vec2(), r: 20, col: 'var(--color-p2)', gr: false };
-        this.g = 2000;
+// Base Game Engine
+class GameEngine {
+    constructor(canvas, input) {
+        this.canvas = canvas;
+        this.ctx = canvas.getContext('2d');
+        this.input = input;
+        this.width = canvas.width;
+        this.height = canvas.height;
+        this.particles = new ParticleManager();
+        this.p1Score = 0;
+        this.p2Score = 0;
+        this.state = 'playing'; // playing, p1win, p2win
+        this.shakeTimer = 0;
+        this.shakeIntensity = 0;
+        this.gameConfig = {
+            p1Color: '#00f3ff',
+            p2Color: '#ff00ea',
+            winScore: 5
+        };
     }
-    updP(p, l, r, u, dt) {
-        if(Input.down(l)) p.v.x -= 3000*dt; if(Input.down(r)) p.v.x += 3000*dt;
-        if(Input.pressed(u) && p.gr) { p.v.y = -900; p.gr = false; Audio.sfxBounce(); }
-        p.v.y += this.g*dt; p.v.x *= 0.85; p.p.add(Vec2.mul(p.v, dt));
-        // Plat collision
-        if(p.v.y>0 && p.p.x>this.plat.x && p.p.x<this.plat.x+this.plat.w && p.p.y+p.r>this.plat.y && p.p.y-p.r<this.plat.y) { p.p.y = this.plat.y-p.r; p.v.y=0; p.gr=true; } else p.gr=false;
-    }
+    init() { this.particles.clear(); this.p1Score = 0; this.p2Score = 0; this.state = 'playing'; this.resetEntities(); }
+    resetEntities() {} // Override in subclass
+    screenShake(duration, intensity) { this.shakeTimer = duration; this.shakeIntensity = intensity; }
     update(dt) {
-        super.update(dt);
-        this.updP(this.p1, 'KeyA', 'KeyD', 'KeyW', dt); this.updP(this.p2, 'ArrowLeft', 'ArrowRight', 'ArrowUp', dt);
-        // Player Collision
-        let cr = M.circIntersect(this.p1, this.p2);
-        if(cr) {
-            Audio.sfxHit(); this.fx.shake(5,0.1); let n = cr.axis; let rv = Vec2.sub(this.p2.v, this.p1.v); let s = rv.dot(n);
-            if(s<0) { let j = -1.5*s/2; let imp = Vec2.mul(n, j); this.p1.v.sub(imp); this.p2.v.add(imp); let c = Vec2.mul(n, cr.overlap/2); this.p1.p.sub(c); this.p2.p.add(c); this.fx.emit(this.p1.p.x+n.x*20, this.p1.p.y+n.y*20, 15, '#fff'); }
+        if(this.state !== 'playing') {
+            if(this.input.isDown('Space')) this.init();
+            return;
         }
-        if(this.p1.p.y>this.h+100) this.score(2); if(this.p2.p.y>this.h+100) this.score(1);
+        if(this.shakeTimer > 0) this.shakeTimer -= dt;
+        this.particles.update(dt);
+        this.updateLogic(dt);
+        if(this.p1Score >= this.gameConfig.winScore) this.state = 'p1win';
+        if(this.p2Score >= this.gameConfig.winScore) this.state = 'p2win';
     }
-    draw(ctx) {
-        ctx.fillStyle='#334'; ctx.fillRect(this.plat.x, this.plat.y, this.plat.w, this.plat.h);
-        ctx.fillStyle=this.p1.col; ctx.beginPath(); ctx.arc(this.p1.p.x, this.p1.p.y, this.p1.r, 0, M.PI2); ctx.fill();
-        ctx.fillStyle=this.p2.col; ctx.beginPath(); ctx.arc(this.p2.p.x, this.p2.p.y, this.p2.r, 0, M.PI2); ctx.fill();
-    }
-}
-
-/** MODULE 8: ASTEROIDS PVP */
-class G_Asteroids extends GameModule {
-    static meta() { return { name: "Debris Field", desc: "Shoot rocks and enemy.", k1: 'wad', a1: 'Thrust/Shoot', k2: 'arrows_ulr', a2: 'Thrust/Shoot' }; }
-    init() {
-        this.p1 = { p: new Vec2(this.w*0.2, this.h/2), v: new Vec2(), a: -M.PI/2, col: 'var(--color-p1)', cd:0 };
-        this.p2 = { p: new Vec2(this.w*0.8, this.h/2), v: new Vec2(), a: M.PI/2, col: 'var(--color-p2)', cd:0 };
-        this.buls = []; this.rox = [];
-        for(let i=0;i<10;i++) this.rox.push({ p: Vec2.random(0, this.w), v: Vec2.randomDir().mul(M.rnd(50,150)), r: M.rnd(20,40) });
-    }
-    updShip(p, l, r, t, f, dt) {
-        if(Input.down(l)) p.a -= 4*dt; if(Input.down(r)) p.a += 4*dt;
-        if(Input.down(t)) { p.v.add(Vec2.fromAngle(p.a, 400*dt)); this.fx.emit(p.p.x, p.p.y, 1, p.col, {t:'spark'}); }
-        p.v.mul(0.98); p.p.add(Vec2.mul(p.v, dt)); p.p.x=M.wrap(p.p.x, this.w); p.p.y=M.wrap(p.p.y, this.h);
-        if(p.cd>0) p.cd-=dt; if(Input.pressed(f) && p.cd<=0) { Audio.sfxShoot(); this.buls.push({p:p.p.clone(), v:Vec2.fromAngle(p.a,600), c:p.col, o:p, l:1.5}); p.cd=0.3; }
-    }
-    update(dt) {
-        super.update(dt);
-        this.updShip(this.p1, 'KeyA', 'KeyD', 'KeyW', 'Space', dt); this.updShip(this.p2, 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'Enter', dt);
-        for(let r of this.rox) { r.p.add(Vec2.mul(r.v, dt)); r.p.x=M.wrap(r.p.x, this.w); r.p.y=M.wrap(r.p.y, this.h); if(r.p.distSq(this.p1.p)<Math.pow(r.r+10,2)){Audio.sfxExplode();this.score(2);return;} if(r.p.distSq(this.p2.p)<Math.pow(r.r+10,2)){Audio.sfxExplode();this.score(1);return;} }
-        for(let i=this.buls.length-1; i>=0; i--) {
-            let b = this.buls[i]; b.p.add(Vec2.mul(b.v, dt)); b.p.x=M.wrap(b.p.x, this.w); b.p.y=M.wrap(b.p.y, this.h); b.l-=dt;
-            let tar = b.o===this.p1?this.p2:this.p1; if(b.p.distSq(tar.p)<225){ Audio.sfxExplode(); this.score(b.o===this.p1?1:2); return; }
-            let hit = false;
-            for(let j=this.rox.length-1; j>=0; j--) { if(b.p.distSq(this.rox[j].p) < this.rox[j].r*this.rox[j].r) { Audio.sfxHit(); this.fx.emit(b.p.x, b.p.y, 10, '#fff'); this.rox.splice(j,1); hit=true; break; } }
-            if(hit || b.l<=0) this.buls.splice(i,1);
+    updateLogic(dt) {} // Override in subclass
+    draw() {
+        this.ctx.save();
+        if(this.shakeTimer > 0) {
+            let dx = (Math.random() - 0.5) * this.shakeIntensity;
+            let dy = (Math.random() - 0.5) * this.shakeIntensity;
+            this.ctx.translate(dx, dy);
         }
+        this.ctx.clearRect(0, 0, this.width, this.height);
+        this.drawBackground();
+        this.particles.draw(this.ctx);
+        this.drawEntities();
+        this.drawUI();
+        this.ctx.restore();
     }
-    draw(ctx) {
-        const dS = p => { ctx.save(); ctx.translate(p.p.x, p.p.y); ctx.rotate(p.a); ctx.strokeStyle=p.col; ctx.lineWidth=2; ctx.beginPath(); ctx.moveTo(15,0); ctx.lineTo(-10,10); ctx.lineTo(-5,0); ctx.lineTo(-10,-10); ctx.closePath(); ctx.stroke(); ctx.restore(); };
-        dS(this.p1); dS(this.p2);
-        ctx.strokeStyle='#777'; ctx.lineWidth=2; for(let r of this.rox) { ctx.beginPath(); ctx.arc(r.p.x, r.p.y, r.r, 0, M.PI2); ctx.stroke(); }
-        for(let b of this.buls) { ctx.fillStyle=b.c; ctx.fillRect(b.p.x-2, b.p.y-2, 4, 4); }
+    drawBackground() {
+        this.ctx.strokeStyle = 'rgba(255,255,255,0.05)';
+        this.ctx.lineWidth = 1;
+        for(let i=0; i<this.width; i+=50) { this.ctx.beginPath(); this.ctx.moveTo(i,0); this.ctx.lineTo(i,this.height); this.ctx.stroke(); }
+        for(let i=0; i<this.height; i+=50) { this.ctx.beginPath(); this.ctx.moveTo(0,i); this.ctx.lineTo(this.width,i); this.ctx.stroke(); }
     }
-}
-
-/** MODULE 9: TOP-DOWN RACING */
-class G_Racing extends GameModule {
-    static meta() { return { name: "Drift Circuit", desc: "Race to the top.", k1: 'ad', a1: 'Steer', k2: 'arrows_lr', a2: 'Steer' }; }
-    init() {
-        this.p1 = { p: new Vec2(this.w*0.3, this.h-50), v: new Vec2(), a: -M.PI/2, col: 'var(--color-p1)' };
-        this.p2 = { p: new Vec2(this.w*0.7, this.h-50), v: new Vec2(), a: -M.PI/2, col: 'var(--color-p2)' };
-        this.obs = []; for(let i=0;i<15;i++) this.obs.push({ x: M.rnd(100, this.w-100), y: M.rnd(100, this.h-200), w: M.rnd(40, 100), h: 20 });
-    }
-    updCar(p, l, r, dt) {
-        if(Input.down(l)) p.a -= 3*dt; if(Input.down(r)) p.a += 3*dt;
-        let fwd = Vec2.fromAngle(p.a); p.v.add(Vec2.mul(fwd, 800*dt));
-        // Drift physics
-        let fV = fwd.clone().mul(p.v.dot(fwd)); let lV = Vec2.sub(p.v, fV);
-        p.v = Vec2.add(fV.mul(0.98), lV.mul(0.8)); p.p.add(Vec2.mul(p.v, dt));
-        p.p.x=M.clamp(p.p.x,0,this.w); p.p.y=M.clamp(p.p.y,0,this.h);
-        for(let o of this.obs) { if(p.p.x>o.x && p.p.x<o.x+o.w && p.p.y>o.y && p.p.y<o.y+o.h) { Audio.sfxHit(); p.v.mul(-0.5); p.p.add(Vec2.mul(p.v, dt*2)); this.fx.shake(5,0.1); } }
-    }
-    update(dt) {
-        super.update(dt); this.updCar(this.p1, 'KeyA', 'KeyD', dt); this.updCar(this.p2, 'ArrowLeft', 'ArrowRight', dt);
-        if(this.p1.p.y < 20) this.score(1); if(this.p2.p.y < 20) this.score(2);
-    }
-    draw(ctx) {
-        ctx.fillStyle='#f00'; ctx.fillRect(0,0,this.w, 20); ctx.fillStyle='#444'; for(let o of this.obs) ctx.fillRect(o.x, o.y, o.w, o.h);
-        const dC = p => { ctx.save(); ctx.translate(p.p.x, p.p.y); ctx.rotate(p.a); ctx.fillStyle=p.col; ctx.fillRect(-10,-5, 20, 10); ctx.restore(); };
-        dC(this.p1); dC(this.p2);
-    }
-}
-
-/** MODULE 10: SNAKE PVP */
-class G_Snake extends GameModule {
-    static meta() { return { name: "Ouroboros", desc: "Classic snake combat. Don't crash.", k1: 'wasd', a1: 'Turn', k2: 'arrows', a2: 'Turn' }; }
-    init() {
-        this.gs = 20; this.bgClear = '#000';
-        this.p1 = { b: [new Vec2(10,10)], d: new Vec2(1,0), col: 'var(--color-p1)' };
-        this.p2 = { b: [new Vec2(this.w/this.gs-10, this.h/this.gs-10)], d: new Vec2(-1,0), col: 'var(--color-p2)' };
-        this.food = new Vec2(Math.floor(this.w/this.gs/2), Math.floor(this.h/this.gs/2)); this.t=0;
-    }
-    update(dt) {
-        super.update(dt); this.t+=dt;
-        if(Input.down('KeyW')&&this.p1.d.y===0) this.p1.d.set(0,-1); if(Input.down('KeyS')&&this.p1.d.y===0) this.p1.d.set(0,1);
-        if(Input.down('KeyA')&&this.p1.d.x===0) this.p1.d.set(-1,0); if(Input.down('KeyD')&&this.p1.d.x===0) this.p1.d.set(1,0);
-        if(Input.down('ArrowUp')&&this.p2.d.y===0) this.p2.d.set(0,-1); if(Input.down('ArrowDown')&&this.p2.d.y===0) this.p2.d.set(0,1);
-        if(Input.down('ArrowLeft')&&this.p2.d.x===0) this.p2.d.set(-1,0); if(Input.down('ArrowRight')&&this.p2.d.x===0) this.p2.d.set(1,0);
+    drawEntities() {} // Override
+    drawUI() {
+        this.ctx.font = '40px Arial';
+        this.ctx.textAlign = 'center';
+        this.ctx.shadowBlur = 10;
         
-        if(this.t>0.08) {
-            this.t=0;
-            const move = p => {
-                let h = Vec2.add(p.b[0], p.d);
-                if(h.x===this.food.x && h.y===this.food.y) { Audio.sfxHit(); this.food.set(M.rndInt(1,this.w/this.gs-2), M.rndInt(1,this.h/this.gs-2)); } else p.b.pop();
-                p.b.unshift(h);
-            }; move(this.p1); move(this.p2);
-            let bnd = p => p.x<0||p.x>=this.w/this.gs||p.y<0||p.y>=this.h/this.gs;
-            let d1 = bnd(this.p1.b[0]); let d2 = bnd(this.p2.b[0]);
-            for(let i=1;i<this.p1.b.length;i++) if(this.p1.b[0].x===this.p1.b[i].x && this.p1.b[0].y===this.p1.b[i].y) d1=true;
-            for(let i=1;i<this.p2.b.length;i++) if(this.p2.b[0].x===this.p2.b[i].x && this.p2.b[0].y===this.p2.b[i].y) d2=true;
-            for(let v of this.p2.b) if(this.p1.b[0].x===v.x && this.p1.b[0].y===v.y) d1=true;
-            for(let v of this.p1.b) if(this.p2.b[0].x===v.x && this.p2.b[0].y===v.y) d2=true;
-            if(d1&&!d2){Audio.sfxExplode();this.score(2);} else if(d2&&!d1){Audio.sfxExplode();this.score(1);} else if(d1&&d2)this.init();
+        this.ctx.fillStyle = this.gameConfig.p1Color;
+        this.ctx.shadowColor = this.gameConfig.p1Color;
+        this.ctx.fillText(this.p1Score, this.width * 0.25, 60);
+        
+        this.ctx.fillStyle = this.gameConfig.p2Color;
+        this.ctx.shadowColor = this.gameConfig.p2Color;
+        this.ctx.fillText(this.p2Score, this.width * 0.75, 60);
+        
+        this.ctx.shadowBlur = 0;
+
+        if(this.state !== 'playing') {
+            this.ctx.fillStyle = 'rgba(0,0,0,0.7)';
+            this.ctx.fillRect(0,0,this.width, this.height);
+            this.ctx.fillStyle = '#fff';
+            this.ctx.font = '60px Arial';
+            let text = this.state === 'p1win' ? "PLAYER 1 WINS" : "PLAYER 2 WINS";
+            this.ctx.fillStyle = this.state === 'p1win' ? this.gameConfig.p1Color : this.gameConfig.p2Color;
+            this.ctx.shadowBlur = 20;
+            this.ctx.shadowColor = this.ctx.fillStyle;
+            this.ctx.fillText(text, this.width/2, this.height/2);
+            this.ctx.font = '20px Arial';
+            this.ctx.fillStyle = '#aaa';
+            this.ctx.shadowBlur = 0;
+            this.ctx.fillText("PRESS SPACE TO RESTART", this.width/2, this.height/2 + 50);
         }
     }
-    draw(ctx) {
-        ctx.fillStyle='#fff'; ctx.fillRect(this.food.x*this.gs, this.food.y*this.gs, this.gs, this.gs);
-        const dS = p => { ctx.fillStyle=p.col; for(let b of p.b) ctx.fillRect(b.x*this.gs, b.y*this.gs, this.gs-1, this.gs-1); };
-        dS(this.p1); dS(this.p2);
+}
+
+/**
+ * GAME 1: NEON PONG WARS
+ * High-velocity physics pong with curve shots based on paddle movement
+ */
+class Game1_NeonPong extends GameEngine {
+    resetEntities() {
+        this.paddleW = 20; this.paddleH = 100;
+        this.p1 = { pos: new Vector2(50, this.height/2 - 50), vel: new Vector2(0,0), speed: 500 };
+        this.p2 = { pos: new Vector2(this.width - 70, this.height/2 - 50), vel: new Vector2(0,0), speed: 500 };
+        this.ball = { pos: new Vector2(this.width/2, this.height/2), vel: new Vector2(Math.random()>0.5?400:-400, (Math.random()-0.5)*200), radius: 10 };
+        this.ballTrail = [];
+    }
+    updateLogic(dt) {
+        // Input P1 (W/S)
+        if(this.input.isDown('KeyW')) this.p1.vel.y = -this.p1.speed;
+        else if(this.input.isDown('KeyS')) this.p1.vel.y = this.p1.speed;
+        else this.p1.vel.y = 0;
+        
+        // Input P2 (Up/Down)
+        if(this.input.isDown('ArrowUp')) this.p2.vel.y = -this.p2.speed;
+        else if(this.input.isDown('ArrowDown')) this.p2.vel.y = this.p2.speed;
+        else this.p2.vel.y = 0;
+
+        this.p1.pos.y = MathUtils.clamp(this.p1.pos.y + this.p1.vel.y * dt, 0, this.height - this.paddleH);
+        this.p2.pos.y = MathUtils.clamp(this.p2.pos.y + this.p2.vel.y * dt, 0, this.height - this.paddleH);
+
+        // Ball Physics
+        let steps = 4; // Sub-stepping for collision accuracy
+        for(let s=0; s<steps; s++) {
+            this.ball.pos.add(Vector2.mult(this.ball.vel, dt/steps));
+            
+            // Wall bounce
+            if(this.ball.pos.y < this.ball.radius) { this.ball.pos.y = this.ball.radius; this.ball.vel.y *= -1; this.particles.emit(this.ball.pos.x, 0, 5, '#fff'); }
+            if(this.ball.pos.y > this.height - this.ball.radius) { this.ball.pos.y = this.height - this.ball.radius; this.ball.vel.y *= -1; this.particles.emit(this.ball.pos.x, this.height, 5, '#fff'); }
+            
+            // Paddle collision
+            let hitPaddle = (paddle, pIndex) => {
+                let rect = {pos: paddle.pos, width: this.paddleW, height: this.paddleH};
+                let closestX = MathUtils.clamp(this.ball.pos.x, rect.pos.x, rect.pos.x + rect.width);
+                let closestY = MathUtils.clamp(this.ball.pos.y, rect.pos.y, rect.pos.y + rect.height);
+                let dist = new Vector2(this.ball.pos.x - closestX, this.ball.pos.y - closestY).magSq();
+                if(dist < this.ball.radius * this.ball.radius) {
+                    this.ball.vel.x *= -1.05; // Speed up
+                    this.ball.vel.y += paddle.vel.y * 0.3; // Spin
+                    this.ball.vel.limit(1500);
+                    this.ball.pos.x = pIndex === 1 ? rect.pos.x + rect.width + this.ball.radius : rect.pos.x - this.ball.radius;
+                    this.screenShake(0.1, 5);
+                    this.particles.emit(this.ball.pos.x, this.ball.pos.y, 15, pIndex === 1 ? this.gameConfig.p1Color : this.gameConfig.p2Color, 2);
+                }
+            };
+            if(this.ball.vel.x < 0) hitPaddle(this.p1, 1);
+            else hitPaddle(this.p2, 2);
+        }
+
+        // Scoring
+        if(this.ball.pos.x < 0) { this.p2Score++; this.screenShake(0.3, 10); this.resetBall(1); }
+        if(this.ball.pos.x > this.width) { this.p1Score++; this.screenShake(0.3, 10); this.resetBall(-1); }
+
+        // Trail
+        this.ballTrail.push({x: this.ball.pos.x, y: this.ball.pos.y});
+        if(this.ballTrail.length > 10) this.ballTrail.shift();
+    }
+    resetBall(dir) {
+        this.ball.pos = new Vector2(this.width/2, this.height/2);
+        this.ball.vel = new Vector2(400 * dir, (Math.random()-0.5)*200);
+        this.ballTrail = [];
+    }
+    drawEntities() {
+        // P1
+        this.ctx.fillStyle = this.gameConfig.p1Color;
+        this.ctx.shadowBlur = 15; this.ctx.shadowColor = this.gameConfig.p1Color;
+        this.ctx.fillRect(this.p1.pos.x, this.p1.pos.y, this.paddleW, this.paddleH);
+        
+        // P2
+        this.ctx.fillStyle = this.gameConfig.p2Color;
+        this.ctx.shadowColor = this.gameConfig.p2Color;
+        this.ctx.fillRect(this.p2.pos.x, this.p2.pos.y, this.paddleW, this.paddleH);
+
+        // Ball Trail
+        this.ctx.shadowBlur = 0;
+        this.ctx.beginPath();
+        for(let i=0; i<this.ballTrail.length; i++) {
+            let t = this.ballTrail[i];
+            if(i===0) this.ctx.moveTo(t.x, t.y); else this.ctx.lineTo(t.x, t.y);
+        }
+        this.ctx.strokeStyle = '#fff';
+        this.ctx.lineWidth = this.ball.radius * 2;
+        this.ctx.globalAlpha = 0.3;
+        this.ctx.stroke();
+        this.ctx.globalAlpha = 1;
+
+        // Ball
+        this.ctx.fillStyle = '#fff';
+        this.ctx.shadowBlur = 20; this.ctx.shadowColor = '#fff';
+        this.ctx.beginPath();
+        this.ctx.arc(this.ball.pos.x, this.ball.pos.y, this.ball.radius, 0, Math.PI*2);
+        this.ctx.fill();
+        this.ctx.shadowBlur = 0;
     }
 }
 
-// --- 7. PROCEDURAL MODULE GENERATOR (Fills to 50) ----------------------------------------------------
-const Archetypes = [ G_GravityDogfight, G_NeonPong, G_SumoCollision, G_Lightcycles, G_BulletHell, G_Artillery, G_PlatformBrawler, G_Asteroids, G_Racing, G_Snake ];
-const Adjs = ["Quantum", "Plasma", "Cyber", "Void", "Aero", "Neon", "Mecha", "Temporal", "Ionic", "Solar"];
-const Nouns = ["Clash", "Assault", "Vortex", "Sector", "Matrix", "Zone", "Core", "Nexus", "Pulse", "Rift"];
+/**
+ * GAME 2: ORBITAL SHOOTERS
+ * Gravity well in center. Ships thrust around and shoot projectiles influenced by gravity.
+ */
+class Game2_Orbital extends GameEngine {
+    resetEntities() {
+        this.gravityCenter = new Vector2(this.width/2, this.height/2);
+        this.gravityStrength = 200000;
+        this.p1 = this.createShip(200, this.height/2, -Math.PI/2, this.gameConfig.p1Color);
+        this.p2 = this.createShip(this.width-200, this.height/2, Math.PI/2, this.gameConfig.p2Color);
+        this.projectiles = [];
+    }
+    createShip(x, y, angle, color) {
+        return { pos: new Vector2(x, y), vel: new Vector2(0,0), angle: angle, thrust: 400, turnSpeed: 4, radius: 15, color: color, cooldown: 0, hp: 3 };
+    }
+    updateLogic(dt) {
+        // P1 Input (W A D, Space)
+        if(this.input.isDown('KeyA')) this.p1.angle -= this.p1.turnSpeed * dt;
+        if(this.input.isDown('KeyD')) this.p1.angle += this.p1.turnSpeed * dt;
+        if(this.input.isDown('KeyW')) this.applyThrust(this.p1, dt);
+        if(this.input.isDown('Space') && this.p1.cooldown <= 0) this.shoot(this.p1);
+        
+        // P2 Input (Up Left Right, Enter)
+        if(this.input.isDown('ArrowLeft')) this.p2.angle -= this.p2.turnSpeed * dt;
+        if(this.input.isDown('ArrowRight')) this.p2.angle += this.p2.turnSpeed * dt;
+        if(this.input.isDown('ArrowUp')) this.applyThrust(this.p2, dt);
+        if(this.input.isDown('Enter') && this.p2.cooldown <= 0) this.shoot(this.p2);
 
-class ProceduralModule extends GameModule {
-    constructor(w,h, id) { super(w,h); this.modId = id; this.archIdx = id % Archetypes.length; this.core = new Archetypes[this.archIdx](w,h); }
-    static genMeta(id) {
-        let a = new Archetypes[id % Archetypes.length](0,0); let m = a.constructor.meta();
-        return { name: `${Adjs[id%Adjs.length]} ${Nouns[(id*3)%Nouns.length]}`, desc: `Modified parameters of ${m.name}. Sec-${id+1}.`, k1: m.k1, a1: m.a1, k2: m.k2, a2: m.a2 };
+        [this.p1, this.p2].forEach(p => {
+            p.cooldown -= dt;
+            // Gravity
+            let dir = Vector2.sub(this.gravityCenter, p.pos);
+            let distSq = dir.magSq();
+            if(distSq > 1000) {
+                dir.normalize();
+                let force = this.gravityStrength / distSq;
+                p.vel.add(Vector2.mult(dir, force * dt));
+            }
+            p.pos.add(Vector2.mult(p.vel, dt));
+            
+            // Screen wrap
+            if(p.pos.x < 0) p.pos.x = this.width; if(p.pos.x > this.width) p.pos.x = 0;
+            if(p.pos.y < 0) p.pos.y = this.height; if(p.pos.y > this.height) p.pos.y = 0;
+
+            // Black hole death
+            if(distSq < 1600) { p.hp = 0; }
+        });
+
+        // Projectiles
+        for(let i = this.projectiles.length-1; i>=0; i--) {
+            let proj = this.projectiles[i];
+            proj.life -= dt;
+            let dir = Vector2.sub(this.gravityCenter, proj.pos);
+            let distSq = dir.magSq();
+            dir.normalize();
+            proj.vel.add(Vector2.mult(dir, (this.gravityStrength / distSq) * dt));
+            proj.pos.add(Vector2.mult(proj.vel, dt));
+            
+            // Screen wrap
+            if(proj.pos.x < 0) proj.pos.x = this.width; if(proj.pos.x > this.width) proj.pos.x = 0;
+            if(proj.pos.y < 0) proj.pos.y = this.height; if(proj.pos.y > this.height) proj.pos.y = 0;
+
+            // Collision with black hole
+            if(distSq < 1600 || proj.life <= 0) { this.projectiles.splice(i, 1); continue; }
+
+            // Collision with players
+            let hitP1 = MathUtils.circleCollision(proj, this.p1);
+            let hitP2 = MathUtils.circleCollision(proj, this.p2);
+            if(hitP1 && proj.owner !== this.p1) { this.p1.hp--; this.particles.emit(proj.pos.x, proj.pos.y, 20, this.p1.color); this.projectiles.splice(i,1); }
+            else if(hitP2 && proj.owner !== this.p2) { this.p2.hp--; this.particles.emit(proj.pos.x, proj.pos.y, 20, this.p2.color); this.projectiles.splice(i,1); }
+        }
+
+        if(this.p1.hp <= 0) { this.p2Score++; this.resetEntities(); this.screenShake(0.5, 20); }
+        if(this.p2.hp <= 0) { this.p1Score++; this.resetEntities(); this.screenShake(0.5, 20); }
     }
-    init() {
-        this.core.fx = this.fx; this.core.score = p => this.score(p); this.core.init();
-        let sMod = 0.5 + ((this.modId*7)%10)*0.1;
-        if(this.core.bh) this.core.bh.m *= sMod;
-        if(this.core.ball) this.core.ball.v.mul(sMod);
-        if(this.core.p1 && this.core.p1.s) { this.core.p1.s *= sMod; this.core.p2.s *= sMod; }
-        this.hue = (this.modId * 45) % 360;
+    applyThrust(p, dt) {
+        let force = Vector2.fromAngle(p.angle, p.thrust * dt);
+        p.vel.add(force);
+        let offset = Vector2.fromAngle(p.angle + Math.PI, p.radius);
+        this.particles.emit(p.pos.x + offset.x, p.pos.y + offset.y, 1, '#ffaa00', 0.5, 0.5);
     }
-    update(dt) { this.core.update(dt); super.update(dt); }
-    draw(ctx) { ctx.save(); if(this.hue) ctx.filter = `hue-rotate(${this.hue}deg)`; this.core.draw(ctx); ctx.restore(); }
+    shoot(p) {
+        p.cooldown = 0.5;
+        let muzzleVel = Vector2.fromAngle(p.angle, 500);
+        this.projectiles.push({ pos: p.pos.copy(), vel: Vector2.add(p.vel, muzzleVel), radius: 3, owner: p, color: p.color, life: 5 });
+        this.screenShake(0.05, 2);
+    }
+    drawEntities() {
+        // Black Hole
+        let grad = this.ctx.createRadialGradient(this.gravityCenter.x, this.gravityCenter.y, 10, this.gravityCenter.x, this.gravityCenter.y, 100);
+        grad.addColorStop(0, '#000'); grad.addColorStop(0.2, '#300'); grad.addColorStop(1, 'transparent');
+        this.ctx.fillStyle = grad;
+        this.ctx.beginPath(); this.ctx.arc(this.gravityCenter.x, this.gravityCenter.y, 100, 0, Math.PI*2); this.ctx.fill();
+        this.ctx.fillStyle = '#000'; this.ctx.beginPath(); this.ctx.arc(this.gravityCenter.x, this.gravityCenter.y, 20, 0, Math.PI*2); this.ctx.fill();
+
+        // Projectiles
+        this.projectiles.forEach(proj => {
+            this.ctx.fillStyle = proj.color;
+            this.ctx.shadowBlur = 10; this.ctx.shadowColor = proj.color;
+            this.ctx.beginPath(); this.ctx.arc(proj.pos.x, proj.pos.y, proj.radius, 0, Math.PI*2); this.ctx.fill();
+        });
+        this.ctx.shadowBlur = 0;
+
+        // Ships
+        let drawShip = (p) => {
+            this.ctx.save();
+            this.ctx.translate(p.pos.x, p.pos.y);
+            this.ctx.rotate(p.angle);
+            this.ctx.strokeStyle = p.color;
+            this.ctx.lineWidth = 2;
+            this.ctx.shadowBlur = 10; this.ctx.shadowColor = p.color;
+            this.ctx.beginPath();
+            this.ctx.moveTo(p.radius, 0);
+            this.ctx.lineTo(-p.radius, p.radius * 0.7);
+            this.ctx.lineTo(-p.radius*0.5, 0);
+            this.ctx.lineTo(-p.radius, -p.radius * 0.7);
+            this.ctx.closePath();
+            this.ctx.stroke();
+            this.ctx.restore();
+            // HP
+            for(let i=0; i<p.hp; i++) {
+                this.ctx.fillStyle = p.color;
+                this.ctx.fillRect(p.pos.x - 10 + i*8, p.pos.y - 25, 6, 4);
+            }
+        };
+        drawShip(this.p1); drawShip(this.p2);
+    }
 }
 
-const FullLibrary = [];
-for(let i=0; i<Archetypes.length; i++) FullLibrary.push({ id: i, class: Archetypes[i], meta: Archetypes[i].meta() });
-for(let i=Archetypes.length; i<50; i++) FullLibrary.push({ id: i, class: class extends ProceduralModule { constructor(w,h){super(w,h,i);} }, meta: ProceduralModule.genMeta(i) });
+/**
+ * GAME 3: SUMO BOTS
+ * Heavy collision physics, pushing opponents off the arena.
+ */
+class Game3_Sumo extends GameEngine {
+    resetEntities() {
+        this.arenaRadius = 300;
+        this.arenaCenter = new Vector2(this.width/2, this.height/2);
+        this.p1 = { pos: new Vector2(this.width/2 - 100, this.height/2), vel: new Vector2(0,0), radius: 25, mass: 10, color: this.gameConfig.p1Color, dashTime: 0 };
+        this.p2 = { pos: new Vector2(this.width/2 + 100, this.height/2), vel: new Vector2(0,0), radius: 25, mass: 10, color: this.gameConfig.p2Color, dashTime: 0 };
+    }
+    updateLogic(dt) {
+        let speed = 1500; let friction = 0.92; let maxSpeed = 300;
 
-// --- 8. UI CONTROLLER & BOOTSTRAP ----------------------------------------------------
-const DOM = {
-    grid: document.getElementById('m-grid'), dash: document.getElementById('dashboard'),
-    eng: document.getElementById('engine-viewport'), bModal: document.getElementById('briefing-modal'),
-    bTitle: document.getElementById('b-title'), bDesc: document.getElementById('b-desc'),
-    bk1: document.getElementById('b-k1'), bk2: document.getElementById('b-k2'),
-    ba1: document.getElementById('b-a1'), ba2: document.getElementById('b-a2'),
-    btnLn: document.getElementById('btn-launch'), btnEx: document.getElementById('btn-exit'), btnMu: document.getElementById('btn-mute'),
-    hud: document.getElementById('hud-layer'), selIdx: -1
-};
+        // Input
+        let p1Input = new Vector2(0,0);
+        if(this.input.isDown('KeyW')) p1Input.y -= 1; if(this.input.isDown('KeyS')) p1Input.y += 1;
+        if(this.input.isDown('KeyA')) p1Input.x -= 1; if(this.input.isDown('KeyD')) p1Input.x += 1;
+        if(p1Input.magSq() > 0) { p1Input.normalize(); this.p1.vel.add(Vector2.mult(p1Input, speed * dt)); }
+        
+        let p2Input = new Vector2(0,0);
+        if(this.input.isDown('ArrowUp')) p2Input.y -= 1; if(this.input.isDown('ArrowDown')) p2Input.y += 1;
+        if(this.input.isDown('ArrowLeft')) p2Input.x -= 1; if(this.input.isDown('ArrowRight')) p2Input.x += 1;
+        if(p2Input.magSq() > 0) { p2Input.normalize(); this.p2.vel.add(Vector2.mult(p2Input, speed * dt)); }
 
-function buildKeys(container, layout) {
-    container.innerHTML = ''; let keys = [];
-    if(layout === 'wasd') keys = ['','W','','A','S','D'];
-    else if(layout === 'arrows') keys = ['','▲','','◄','▼','►'];
-    else if(layout === 'wad') keys = ['','W','','A','','D'];
-    else if(layout === 'arrows_ulr') keys = ['','▲','','◄','','►'];
-    else if(layout === 'ws') keys = ['','W','','','S',''];
-    else if(layout === 'arrows_ud') keys = ['','▲','','','▼',''];
-    else if(layout === 'ad') keys = ['','','','A','','D'];
-    else if(layout === 'arrows_lr') keys = ['','','','◄','','►'];
-    keys.forEach(k => { let d=document.createElement('div'); d.className=k?'k-btn':'k-btn k-empty'; d.innerText=k; container.appendChild(d); });
+        // Dash mechanics (Space/Enter)
+        if(this.input.isDown('Space') && this.p1.dashTime <= 0) { this.p1.vel.mult(3); this.p1.dashTime = 2; this.screenShake(0.1, 5); }
+        if(this.input.isDown('Enter') && this.p2.dashTime <= 0) { this.p2.vel.mult(3); this.p2.dashTime = 2; this.screenShake(0.1, 5); }
+        this.p1.dashTime -= dt; this.p2.dashTime -= dt;
+
+        // Physics
+        [this.p1, this.p2].forEach(p => { p.vel.mult(friction); p.pos.add(Vector2.mult(p.vel, dt)); });
+
+        // Player Collision (Elastic)
+        if(MathUtils.circleCollision(this.p1, this.p2)) {
+            MathUtils.resolveElasticCollision(this.p1, this.p2);
+            let overlap = (this.p1.radius + this.p2.radius) - this.p1.pos.dist(this.p2.pos);
+            let dir = Vector2.sub(this.p1.pos, this.p2.pos).normalize();
+            this.p1.pos.add(Vector2.mult(dir, overlap/2));
+            this.p2.pos.sub(Vector2.mult(dir, overlap/2));
+            this.screenShake(0.1, 10);
+            let mid = Vector2.add(this.p1.pos, this.p2.pos).div(2);
+            this.particles.emit(mid.x, mid.y, 10, '#fff');
+        }
+
+        // Arena Out
+        if(this.p1.pos.dist(this.arenaCenter) > this.arenaRadius) { this.p2Score++; this.resetEntities(); }
+        if(this.p2.pos.dist(this.arenaCenter) > this.arenaRadius) { this.p1Score++; this.resetEntities(); }
+    }
+    drawEntities() {
+        // Arena
+        this.ctx.beginPath();
+        this.ctx.arc(this.arenaCenter.x, this.arenaCenter.y, this.arenaRadius, 0, Math.PI*2);
+        this.ctx.fillStyle = 'rgba(255,255,255,0.05)';
+        this.ctx.fill();
+        this.ctx.lineWidth = 5;
+        this.ctx.strokeStyle = '#fff';
+        this.ctx.stroke();
+
+        // Players
+        let drawBot = (p) => {
+            this.ctx.fillStyle = p.color;
+            this.ctx.shadowBlur = 15; this.ctx.shadowColor = p.color;
+            this.ctx.beginPath(); this.ctx.arc(p.pos.x, p.pos.y, p.radius, 0, Math.PI*2); this.ctx.fill();
+            this.ctx.shadowBlur = 0;
+            // Face/Core
+            this.ctx.fillStyle = '#000';
+            this.ctx.beginPath(); this.ctx.arc(p.pos.x, p.pos.y, p.radius*0.4, 0, Math.PI*2); this.ctx.fill();
+            // Dash Indicator
+            if(p.dashTime <= 0) {
+                this.ctx.strokeStyle = '#fff'; this.ctx.lineWidth = 2;
+                this.ctx.beginPath(); this.ctx.arc(p.pos.x, p.pos.y, p.radius + 5, 0, Math.PI*2); this.ctx.stroke();
+            }
+        };
+        drawBot(this.p1); drawBot(this.p2);
+    }
 }
 
-FullLibrary.forEach((mod) => {
-    let card = document.createElement('div'); card.className = 'module-card';
-    card.innerHTML = `<div class="mc-id">OP-${(mod.id+1).toString().padStart(2,'0')}</div><h3 class="mc-title">${mod.meta.name}</h3><p class="mc-desc">${mod.meta.desc}</p><span class="mc-tag">PvP Combat</span>`;
-    card.addEventListener('click', () => {
-        DOM.selIdx = mod.id; DOM.bTitle.innerText = mod.meta.name; DOM.bDesc.innerText = mod.meta.desc;
-        DOM.ba1.innerText = mod.meta.a1; buildKeys(DOM.bk1, mod.meta.k1); DOM.ba2.innerText = mod.meta.a2; buildKeys(DOM.bk2, mod.meta.k2);
-        DOM.dash.style.transform = 'scale(0.95)'; DOM.dash.style.opacity = '0';
-        setTimeout(()=>{ DOM.dash.style.display='none'; DOM.eng.style.display='block'; DOM.bModal.style.display='block'; setTimeout(()=>DOM.bModal.classList.add('active'), 50); }, 400);
-    });
-    DOM.grid.appendChild(card);
-});
+/**
+ * GAME 4: NEON TANKS
+ * Classic top-down tank shooter with bouncing bullets and destructible walls.
+ */
+class Game4_Tanks extends GameEngine {
+    resetEntities() {
+        this.p1 = { pos: new Vector2(100, 100), angle: 0, vel: new Vector2(0,0), radius: 15, color: this.gameConfig.p1Color, cooldown: 0 };
+        this.p2 = { pos: new Vector2(this.width-100, this.height-100), angle: Math.PI, vel: new Vector2(0,0), radius: 15, color: this.gameConfig.p2Color, cooldown: 0 };
+        this.bullets = [];
+        this.walls = [];
+        // Generate symmetric maze
+        for(let i=0; i<8; i++) {
+            let x = MathUtils.random(200, this.width/2 - 50);
+            let y = MathUtils.random(100, this.height - 100);
+            let w = MathUtils.random(50, 150); let h = 20;
+            if(Math.random() > 0.5) { let t = w; w = h; h = t; }
+            this.walls.push({pos: new Vector2(x,y), width: w, height: h});
+            this.walls.push({pos: new Vector2(this.width - x - w, this.height - y - h), width: w, height: h});
+        }
+    }
+    updateLogic(dt) {
+        let speed = 150; let turnSpeed = 3;
+        
+        // P1
+        if(this.input.isDown('KeyA')) this.p1.angle -= turnSpeed * dt;
+        if(this.input.isDown('KeyD')) this.p1.angle += turnSpeed * dt;
+        if(this.input.isDown('KeyW')) { this.p1.pos.add(Vector2.fromAngle(this.p1.angle, speed*dt)); }
+        if(this.input.isDown('KeyS')) { this.p1.pos.sub(Vector2.fromAngle(this.p1.angle, speed*dt)); }
+        if(this.input.isDown('Space') && this.p1.cooldown <= 0) this.shoot(this.p1);
+        
+        // P2
+        if(this.input.isDown('ArrowLeft')) this.p2.angle -= turnSpeed * dt;
+        if(this.input.isDown('ArrowRight')) this.p2.angle += turnSpeed * dt;
+        if(this.input.isDown('ArrowUp')) { this.p2.pos.add(Vector2.fromAngle(this.p2.angle, speed*dt)); }
+        if(this.input.isDown('ArrowDown')) { this.p2.pos.sub(Vector2.fromAngle(this.p2.angle, speed*dt)); }
+        if(this.input.isDown('Enter') && this.p2.cooldown <= 0) this.shoot(this.p2);
 
-DOM.btnLn.addEventListener('click', () => {
-    DOM.bModal.classList.remove('active');
-    setTimeout(() => { DOM.bModal.style.display='none'; DOM.btnEx.style.display='block'; DOM.btnMu.style.display='block'; DOM.hud.style.display='flex'; Sys.start(FullLibrary[DOM.selIdx].class); }, 300);
-});
+        this.p1.cooldown -= dt; this.p2.cooldown -= dt;
 
-DOM.btnEx.addEventListener('click', () => {
-    Sys.stop(); DOM.btnEx.style.display='none'; DOM.btnMu.style.display='none'; DOM.hud.style.display='none'; DOM.eng.style.display='none'; DOM.dash.style.display='flex';
-    setTimeout(() => { DOM.dash.style.opacity='1'; DOM.dash.style.transform='scale(1)'; }, 50);
-});
+        // Keep in bounds
+        [this.p1, this.p2].forEach(p => {
+            p.pos.x = MathUtils.clamp(p.pos.x, p.radius, this.width-p.radius);
+            p.pos.y = MathUtils.clamp(p.pos.y, p.radius, this.height-p.radius);
+            // Tank Wall Collision (simple box push)
+            this.walls.forEach(w => {
+                let rect = {pos: new Vector2(p.pos.x - p.radius, p.pos.y - p.radius), width: p.radius*2, height: p.radius*2};
+                if(MathUtils.rectCollision(rect, w)) {
+                    // Push out based on center logic (simplified for density)
+                    let cx = w.pos.x + w.width/2; let cy = w.pos.y + w.height/2;
+                    if(Math.abs(p.pos.x - cx) > Math.abs(p.pos.y - cy)) {
+                        p.pos.x = p.pos.x < cx ? w.pos.x - p.radius : w.pos.x + w.width + p.radius;
+                    } else {
+                        p.pos.y = p.pos.y < cy ? w.pos.y - p.radius : w.pos.y + w.height + p.radius;
+                    }
+                }
+            });
+        });
 
-DOM.btnMu.addEventListener('click', () => { DOM.btnMu.innerText = Audio.toggleMute() ? "Audio: OFF" : "Audio: ON"; });
+        // Bullets
+        for(let i=this.bullets.length-1; i>=0; i--) {
+            let b = this.bullets[i];
+            b.pos.add(Vector2.mult(b.vel, dt));
+            b.bounces -= dt;
+
+            // Wall bounce
+            if(b.pos.x < 0 || b.pos.x > this.width) { b.vel.x *= -1; b.pos.x = MathUtils.clamp(b.pos.x, 0, this.width); }
+            if(b.pos.y < 0 || b.pos.y > this.height) { b.vel.y *= -1; b.pos.y = MathUtils.clamp(b.pos.y, 0, this.height); }
+
+            let hitWall = false;
+            this.walls.forEach(w => {
+                if(b.pos.x > w.pos.x && b.pos.x < w.pos.x + w.width && b.pos.y > w.pos.y && b.pos.y < w.pos.y + w.height) {
+                    hitWall = true;
+                    // Simple AABB bounce
+                    let distLeft = Math.abs(b.pos.x - w.pos.x); let distRight = Math.abs(b.pos.x - (w.pos.x+w.width));
+                    let distTop = Math.abs(b.pos.y - w.pos.y); let distBot = Math.abs(b.pos.y - (w.pos.y+w.height));
+                    let min = Math.min(distLeft, distRight, distTop, distBot);
+                    if(min === distLeft || min === distRight) b.vel.x *= -1; else b.vel.y *= -1;
+                    b.pos.add(Vector2.mult(b.vel, dt)); // Step out
+                }
+            });
+
+            if(b.bounces <= -5 || (hitWall && b.bounces < 0)) { this.bullets.splice(i,1); continue; }
+
+            // Player hit
+            if(MathUtils.circleCollision(b, this.p1) && b.owner !== this.p1) { this.p2Score++; this.resetEntities(); this.screenShake(0.5, 20); break; }
+            if(MathUtils.circleCollision(b, this.p2) && b.owner !== this.p2) { this.p1Score++; this.resetEntities(); this.screenShake(0.5, 20); break; }
+        }
+    }
+    shoot(p) {
+        p.cooldown = 1.0;
+        let bVel = Vector2.fromAngle(p.angle, 400);
+        let start = Vector2.add(p.pos, Vector2.fromAngle(p.angle, p.radius + 5));
+        this.bullets.push({pos: start, vel: bVel, radius: 4, color: p.color, owner: p, bounces: 5}); // 5 seconds life
+        this.screenShake(0.1, 3);
+    }
+    drawEntities() {
+        this.ctx.fillStyle = '#222';
+        this.ctx.strokeStyle = '#555';
+        this.ctx.lineWidth = 2;
+        this.walls.forEach(w => {
+            this.ctx.fillRect(w.pos.x, w.pos.y, w.width, w.height);
+            this.ctx.strokeRect(w.pos.x, w.pos.y, w.width, w.height);
+        });
+
+        this.bullets.forEach(b => {
+            this.ctx.fillStyle = b.color;
+            this.ctx.shadowBlur = 10; this.ctx.shadowColor = b.color;
+            this.ctx.beginPath(); this.ctx.arc(b.pos.x, b.pos.y, b.radius, 0, Math.PI*2); this.ctx.fill();
+        });
+        this.ctx.shadowBlur = 0;
+
+        let drawTank = (p) => {
+            this.ctx.save();
+            this.ctx.translate(p.pos.x, p.pos.y);
+            this.ctx.rotate(p.angle);
+            this.ctx.fillStyle = p.color;
+            this.ctx.shadowBlur = 10; this.ctx.shadowColor = p.color;
+            this.ctx.fillRect(-p.radius, -p.radius, p.radius*2, p.radius*2);
+            this.ctx.fillStyle = '#fff';
+            this.ctx.fillRect(0, -3, p.radius*1.5, 6); // Barrel
+            this.ctx.restore();
+        };
+        drawTank(this.p1); drawTank(this.p2);
+    }
+}
+
+/**
+ * GAME 5: TRON BIKES (SNAKE DUELS)
+ * High speed 90-degree turning grid combat.
+ */
+class Game5_Tron extends GameEngine {
+    resetEntities() {
+        this.grid = 10;
+        this.p1 = { pos: new Vector2(100, this.height/2), dir: new Vector2(1,0), nextDir: new Vector2(1,0), trail: [], color: this.gameConfig.p1Color, timer: 0 };
+        this.p2 = { pos: new Vector2(this.width-100, this.height/2), dir: new Vector2(-1,0), nextDir: new Vector2(-1,0), trail: [], color: this.gameConfig.p2Color, timer: 0 };
+        this.speed = 0.03; // seconds per move
+    }
+    updateLogic(dt) {
+        // P1 Input
+        if(this.input.isDown('KeyW') && this.p1.dir.y === 0) this.p1.nextDir = new Vector2(0,-1);
+        if(this.input.isDown('KeyS') && this.p1.dir.y === 0) this.p1.nextDir = new Vector2(0,1);
+        if(this.input.isDown('KeyA') && this.p1.dir.x === 0) this.p1.nextDir = new Vector2(-1,0);
+        if(this.input.isDown('KeyD') && this.p1.dir.x === 0) this.p1.nextDir = new Vector2(1,0);
+        
+        // P2 Input
+        if(this.input.isDown('ArrowUp') && this.p2.dir.y === 0) this.p2.nextDir = new Vector2(0,-1);
+        if(this.input.isDown('ArrowDown') && this.p2.dir.y === 0) this.p2.nextDir = new Vector2(0,1);
+        if(this.input.isDown('ArrowLeft') && this.p2.dir.x === 0) this.p2.nextDir = new Vector2(-1,0);
+        if(this.input.isDown('ArrowRight') && this.p2.dir.x === 0) this.p2.nextDir = new Vector2(1,0);
+
+        let movePlayer = (p, other) => {
+            p.timer += dt;
+            if(p.timer >= this.speed) {
+                p.timer = 0;
+                p.trail.push(p.pos.copy());
+                p.dir = p.nextDir;
+                p.pos.add(Vector2.mult(p.dir, this.grid));
+                
+                // Collision checks
+                let crash = false;
+                if(p.pos.x < 0 || p.pos.x >= this.width || p.pos.y < 0 || p.pos.y >= this.height) crash = true;
+                [p, other].forEach(pCheck => {
+                    pCheck.trail.forEach(t => {
+                        if(Math.abs(t.x - p.pos.x) < this.grid/2 && Math.abs(t.y - p.pos.y) < this.grid/2) crash = true;
+                    });
+                });
+                return crash;
+            }
+            return false;
+        };
+
+        let p1Crash = movePlayer(this.p1, this.p2);
+        let p2Crash = movePlayer(this.p2, this.p1);
+
+        if(p1Crash && p2Crash) { this.resetEntities(); this.screenShake(0.5, 20); } // Draw
+        else if(p1Crash) { this.p2Score++; this.resetEntities(); this.screenShake(0.5, 20); }
+        else if(p2Crash) { this.p1Score++; this.resetEntities(); this.screenShake(0.5, 20); }
+    }
+    drawEntities() {
+        let drawBike = (p) => {
+            this.ctx.fillStyle = p.color;
+            this.ctx.shadowBlur = 15; this.ctx.shadowColor = p.color;
+            p.trail.forEach(t => { this.ctx.fillRect(t.x, t.y, this.grid, this.grid); });
+            this.ctx.fillStyle = '#fff';
+            this.ctx.fillRect(p.pos.x, p.pos.y, this.grid, this.grid);
+            this.ctx.shadowBlur = 0;
+        };
+        drawBike(this.p1); drawBike(this.p2);
+    }
+}
+
+/**
+ * GAME 6: LASER HOCKEY
+ * Fast-paced air hockey with zero friction and explosive goals.
+ */
+class Game6_Hockey extends GameEngine {
+    resetEntities() {
+        this.p1 = { pos: new Vector2(this.width/4, this.height/2), vel: new Vector2(0,0), radius: 30, color: this.gameConfig.p1Color, mass: 5 };
+        this.p2 = { pos: new Vector2(this.width*0.75, this.height/2), vel: new Vector2(0,0), radius: 30, color: this.gameConfig.p2Color, mass: 5 };
+        this.puck = { pos: new Vector2(this.width/2, this.height/2), vel: new Vector2(0,0), radius: 20, color: '#fff', mass: 1 };
+        this.goalHeight = 200;
+        this.goalY = this.height/2 - this.goalHeight/2;
+    }
+    updateLogic(dt) {
+        let speed = 2000; let friction = 0.90;
+        
+        let p1Input = new Vector2(0,0);
+        if(this.input.isDown('KeyW')) p1Input.y -= 1; if(this.input.isDown('KeyS')) p1Input.y += 1;
+        if(this.input.isDown('KeyA')) p1Input.x -= 1; if(this.input.isDown('KeyD')) p1Input.x += 1;
+        if(p1Input.magSq() > 0) { p1Input.normalize(); this.p1.vel.add(Vector2.mult(p1Input, speed * dt)); }
+        
+        let p2Input = new Vector2(0,0);
+        if(this.input.isDown('ArrowUp')) p2Input.y -= 1; if(this.input.isDown('ArrowDown')) p2Input.y += 1;
+        if(this.input.isDown('ArrowLeft')) p2Input.x -= 1; if(this.input.isDown('ArrowRight')) p2Input.x += 1;
+        if(p2Input.magSq() > 0) { p2Input.normalize(); this.p2.vel.add(Vector2.mult(p2Input, speed * dt)); }
+
+        [this.p1, this.p2, this.puck].forEach(p => {
+            p.vel.mult(p === this.puck ? 0.99 : friction);
+            p.pos.add(Vector2.mult(p.vel, dt));
+            
+            // Wall Bounds
+            if(p.pos.y < p.radius) { p.pos.y = p.radius; p.vel.y *= -1; }
+            if(p.pos.y > this.height - p.radius) { p.pos.y = this.height - p.radius; p.vel.y *= -1; }
+            
+            // Goal Logic & X Bounds
+            let inGoalY = p.pos.y > this.goalY && p.pos.y < this.goalY + this.goalHeight;
+            if(p === this.puck) {
+                if(p.pos.x < p.radius) {
+                    if(inGoalY) { this.p2Score++; this.resetEntities(); this.screenShake(0.5, 20); }
+                    else { p.pos.x = p.radius; p.vel.x *= -1; }
+                }
+                if(p.pos.x > this.width - p.radius) {
+                    if(inGoalY) { this.p1Score++; this.resetEntities(); this.screenShake(0.5, 20); }
+                    else { p.pos.x = this.width - p.radius; p.vel.x *= -1; }
+                }
+            } else {
+                if(p.pos.x < p.radius) { p.pos.x = p.radius; p.vel.x *= -0.5; }
+                if(p.pos.x > this.width - p.radius) { p.pos.x = this.width - p.radius; p.vel.x *= -0.5; }
+                // Center line restriction
+                if(p === this.p1 && p.pos.x > this.width/2 - p.radius) { p.pos.x = this.width/2 - p.radius; p.vel.x *= -0.5; }
+                if(p === this.p2 && p.pos.x < this.width/2 + p.radius) { p.pos.x = this.width/2 + p.radius; p.vel.x *= -0.5; }
+            }
+        });
+
+        // Collisions
+        if(MathUtils.circleCollision(this.p1, this.puck)) { MathUtils.resolveElasticCollision(this.p1, this.puck); this.particles.emit(this.puck.pos.x, this.puck.pos.y, 5, this.p1.color); }
+        if(MathUtils.circleCollision(this.p2, this.puck)) { MathUtils.resolveElasticCollision(this.p2, this.puck); this.particles.emit(this.puck.pos.x, this.puck.pos.y, 5, this.p2.color); }
+    }
+    drawEntities() {
+        // Center line
+        this.ctx.strokeStyle = 'rgba(255,255,255,0.2)'; this.ctx.lineWidth = 4;
+        this.ctx.beginPath(); this.ctx.moveTo(this.width/2, 0); this.ctx.lineTo(this.width/2, this.height); this.ctx.stroke();
+        this.ctx.beginPath(); this.ctx.arc(this.width/2, this.height/2, 100, 0, Math.PI*2); this.ctx.stroke();
+
+        // Goals
+        this.ctx.fillStyle = 'rgba(0, 243, 255, 0.2)'; this.ctx.fillRect(0, this.goalY, 20, this.goalHeight);
+        this.ctx.fillStyle = 'rgba(255, 0, 234, 0.2)'; this.ctx.fillRect(this.width-20, this.goalY, 20, this.goalHeight);
+
+        [this.p1, this.p2].forEach(p => {
+            this.ctx.fillStyle = p.color;
+            this.ctx.shadowBlur = 20; this.ctx.shadowColor = p.color;
+            this.ctx.beginPath(); this.ctx.arc(p.pos.x, p.pos.y, p.radius, 0, Math.PI*2); this.ctx.fill();
+            this.ctx.fillStyle = '#000';
+            this.ctx.beginPath(); this.ctx.arc(p.pos.x, p.pos.y, p.radius*0.6, 0, Math.PI*2); this.ctx.fill();
+        });
+
+        this.ctx.fillStyle = this.puck.color;
+        this.ctx.shadowColor = this.puck.color;
+        this.ctx.beginPath(); this.ctx.arc(this.puck.pos.x, this.puck.pos.y, this.puck.radius, 0, Math.PI*2); this.ctx.fill();
+        this.ctx.shadowBlur = 0;
+    }
+}
+
+/**
+ * GAME 7: GRAVITY JOUST
+ * Flappy-bird style thrusting, trying to land on top of the opponent.
+ */
+class Game7_Joust extends GameEngine {
+    resetEntities() {
+        this.p1 = { pos: new Vector2(200, this.height/2), vel: new Vector2(0,0), radius: 20, color: this.gameConfig.p1Color };
+        this.p2 = { pos: new Vector2(this.width-200, this.height/2), vel: new Vector2(0,0), radius: 20, color: this.gameConfig.p2Color };
+        this.gravity = 800;
+        this.thrust = 1500;
+    }
+    updateLogic(dt) {
+        let hSpeed = 300;
+
+        // P1
+        this.p1.vel.x = 0;
+        if(this.input.isDown('KeyA')) this.p1.vel.x = -hSpeed;
+        if(this.input.isDown('KeyD')) this.p1.vel.x = hSpeed;
+        if(this.input.isDown('KeyW')) { this.p1.vel.y -= this.thrust * dt; this.particles.emit(this.p1.pos.x, this.p1.pos.y+this.p1.radius, 2, '#fff', 0.5, 0.5); }
+        
+        // P2
+        this.p2.vel.x = 0;
+        if(this.input.isDown('ArrowLeft')) this.p2.vel.x = -hSpeed;
+        if(this.input.isDown('ArrowRight')) this.p2.vel.x = hSpeed;
+        if(this.input.isDown('ArrowUp')) { this.p2.vel.y -= this.thrust * dt; this.particles.emit(this.p2.pos.x, this.p2.pos.y+this.p2.radius, 2, '#fff', 0.5, 0.5); }
+
+        [this.p1, this.p2].forEach(p => {
+            p.vel.y += this.gravity * dt;
+            p.vel.y = MathUtils.clamp(p.vel.y, -1000, 1000);
+            p.pos.add(Vector2.mult(p.vel, dt));
+            
+            // Wrap X
+            if(p.pos.x < 0) p.pos.x = this.width; if(p.pos.x > this.width) p.pos.x = 0;
+            // Bound Y
+            if(p.pos.y > this.height - p.radius) { p.pos.y = this.height - p.radius; p.vel.y *= -0.5; }
+            if(p.pos.y < p.radius) { p.pos.y = p.radius; p.vel.y = 0; }
+        });
+
+        // Joust Collision
+        if(MathUtils.circleCollision(this.p1, this.p2)) {
+            // Who is higher?
+            if(this.p1.pos.y < this.p2.pos.y - 10) { this.p1Score++; this.resetEntities(); this.screenShake(0.5, 20); }
+            else if(this.p2.pos.y < this.p1.pos.y - 10) { this.p2Score++; this.resetEntities(); this.screenShake(0.5, 20); }
+            else { MathUtils.resolveElasticCollision(this.p1, this.p2); } // Bounce off if side-by-side
+        }
+    }
+    drawEntities() {
+        [this.p1, this.p2].forEach(p => {
+            this.ctx.fillStyle = p.color;
+            this.ctx.shadowBlur = 15; this.ctx.shadowColor = p.color;
+            this.ctx.beginPath();
+            // Draw a lance shape
+            this.ctx.moveTo(p.pos.x, p.pos.y + p.radius);
+            this.ctx.lineTo(p.pos.x - p.radius, p.pos.y - p.radius*0.5);
+            this.ctx.lineTo(p.pos.x, p.pos.y - p.radius*1.5);
+            this.ctx.lineTo(p.pos.x + p.radius, p.pos.y - p.radius*0.5);
+            this.ctx.fill();
+            this.ctx.shadowBlur = 0;
+        });
+        
+        // Lava floor
+        this.ctx.fillStyle = 'rgba(255, 50, 0, 0.3)';
+        this.ctx.fillRect(0, this.height-20, this.width, 20);
+    }
+}
+
+/**
+ * GAME 8: DODGE & SHOOT
+ * Twin-stick style bullet hell versus match.
+ */
+class Game8_Dodge extends GameEngine {
+    resetEntities() {
+        this.p1 = { pos: new Vector2(100, this.height/2), vel: new Vector2(0,0), radius: 10, color: this.gameConfig.p1Color, cd: 0, spread: false };
+        this.p2 = { pos: new Vector2(this.width-100, this.height/2), vel: new Vector2(0,0), radius: 10, color: this.gameConfig.p2Color, cd: 0, spread: false };
+        this.bullets = [];
+        this.powerups = [];
+        this.puTimer = 5;
+    }
+    updateLogic(dt) {
+        let speed = 250;
+        
+        let p1Move = new Vector2(0,0);
+        if(this.input.isDown('KeyW')) p1Move.y -= 1; if(this.input.isDown('KeyS')) p1Move.y += 1;
+        if(this.input.isDown('KeyA')) p1Move.x -= 1; if(this.input.isDown('KeyD')) p1Move.x += 1;
+        if(p1Move.magSq() > 0) { p1Move.normalize(); this.p1.pos.add(Vector2.mult(p1Move, speed*dt)); }
+        if(this.input.isDown('Space') && this.p1.cd <= 0) this.shoot(this.p1, 1);
+
+        let p2Move = new Vector2(0,0);
+        if(this.input.isDown('ArrowUp')) p2Move.y -= 1; if(this.input.isDown('ArrowDown')) p2Move.y += 1;
+        if(this.input.isDown('ArrowLeft')) p2Move.x -= 1; if(this.input.isDown('ArrowRight')) p2Move.x += 1;
+        if(p2Move.magSq() > 0) { p2Move.normalize(); this.p2.pos.add(Vector2.mult(p2Move, speed*dt)); }
+        if(this.input.isDown('Enter') && this.p2.cd <= 0) this.shoot(this.p2, -1);
+
+        this.p1.cd -= dt; this.p2.cd -= dt; this.puTimer -= dt;
+
+        [this.p1, this.p2].forEach(p => {
+            p.pos.x = MathUtils.clamp(p.pos.x, p.radius, this.width-p.radius);
+            p.pos.y = MathUtils.clamp(p.pos.y, p.radius, this.height-p.radius);
+            // Powerup pickup
+            this.powerups.forEach((pu, i) => {
+                if(MathUtils.circleCollision(p, pu)) { p.spread = true; this.powerups.splice(i,1); }
+            });
+        });
+
+        if(this.puTimer <= 0) {
+            this.powerups.push({pos: new Vector2(MathUtils.random(200, this.width-200), MathUtils.random(100, this.height-100)), radius: 15});
+            this.puTimer = 10;
+        }
+
+        for(let i=this.bullets.length-1; i>=0; i--) {
+            let b = this.bullets[i];
+            b.pos.add(Vector2.mult(b.vel, dt));
+            if(b.pos.x < 0 || b.pos.x > this.width || b.pos.y < 0 || b.pos.y > this.height) { this.bullets.splice(i,1); continue; }
+            if(MathUtils.circleCollision(b, this.p1) && b.owner !== this.p1) { this.p2Score++; this.resetEntities(); this.screenShake(0.5, 20); break; }
+            if(MathUtils.circleCollision(b, this.p2) && b.owner !== this.p2) { this.p1Score++; this.resetEntities(); this.screenShake(0.5, 20); break; }
+        }
+    }
+    shoot(p, dirX) {
+        p.cd = 0.15;
+        let bSpeed = 600;
+        this.bullets.push({pos: p.pos.copy(), vel: new Vector2(dirX * bSpeed, 0), radius: 3, color: p.color, owner: p});
+        if(p.spread) {
+            this.bullets.push({pos: p.pos.copy(), vel: new Vector2(dirX * bSpeed, bSpeed*0.2), radius: 3, color: p.color, owner: p});
+            this.bullets.push({pos: p.pos.copy(), vel: new Vector2(dirX * bSpeed, -bSpeed*0.2), radius: 3, color: p.color, owner: p});
+        }
+    }
+    drawEntities() {
+        this.powerups.forEach(pu => {
+            this.ctx.fillStyle = '#ffaa00';
+            this.ctx.shadowBlur = 15; this.ctx.shadowColor = '#ffaa00';
+            this.ctx.beginPath(); this.ctx.arc(pu.pos.x, pu.pos.y, pu.radius, 0, Math.PI*2); this.ctx.fill();
+        });
+        this.ctx.shadowBlur = 0;
+
+        this.bullets.forEach(b => {
+            this.ctx.fillStyle = b.color;
+            this.ctx.fillRect(b.pos.x-b.radius, b.pos.y-b.radius, b.radius*2, b.radius*2);
+        });
+
+        [this.p1, this.p2].forEach(p => {
+            this.ctx.fillStyle = p.color;
+            this.ctx.shadowBlur = 10; this.ctx.shadowColor = p.color;
+            this.ctx.beginPath(); this.ctx.arc(p.pos.x, p.pos.y, p.radius, 0, Math.PI*2); this.ctx.fill();
+        });
+        this.ctx.shadowBlur = 0;
+    }
+}
+
+/**
+ * GAME 9: ASTEROID MINER
+ * Collect stars to win. Shoot asteroids that bounce around.
+ */
+class Game9_Miner extends GameEngine {
+    resetEntities() {
+        this.p1 = { pos: new Vector2(100, this.height/2), vel: new Vector2(0,0), radius: 15, color: this.gameConfig.p1Color, score: 0 };
+        this.p2 = { pos: new Vector2(this.width-100, this.height/2), vel: new Vector2(0,0), radius: 15, color: this.gameConfig.p2Color, score: 0 };
+        this.stars = [];
+        this.asteroids = [];
+        for(let i=0; i<5; i++) this.spawnStar();
+        for(let i=0; i<8; i++) this.asteroids.push({
+            pos: new Vector2(this.width/2 + (Math.random()-0.5)*300, this.height/2 + (Math.random()-0.5)*300),
+            vel: new Vector2((Math.random()-0.5)*200, (Math.random()-0.5)*200),
+            radius: MathUtils.random(15, 35)
+        });
+        this.gameConfig.winScore = 10;
+    }
+    spawnStar() { this.stars.push({pos: new Vector2(MathUtils.random(100, this.width-100), MathUtils.random(100, this.height-100)), radius: 8}); }
+    updateLogic(dt) {
+        let accel = 1000; let friction = 0.95;
+        
+        // P1
+        if(this.input.isDown('KeyW')) this.p1.vel.y -= accel * dt; if(this.input.isDown('KeyS')) this.p1.vel.y += accel * dt;
+        if(this.input.isDown('KeyA')) this.p1.vel.x -= accel * dt; if(this.input.isDown('KeyD')) this.p1.vel.x += accel * dt;
+        
+        // P2
+        if(this.input.isDown('ArrowUp')) this.p2.vel.y -= accel * dt; if(this.input.isDown('ArrowDown')) this.p2.vel.y += accel * dt;
+        if(this.input.isDown('ArrowLeft')) this.p2.vel.x -= accel * dt; if(this.input.isDown('ArrowRight')) this.p2.vel.x += accel * dt;
+
+        [this.p1, this.p2].forEach((p, pIndex) => {
+            p.vel.mult(friction);
+            p.pos.add(Vector2.mult(p.vel, dt));
+            p.pos.x = MathUtils.clamp(p.pos.x, p.radius, this.width-p.radius);
+            p.pos.y = MathUtils.clamp(p.pos.y, p.radius, this.height-p.radius);
+
+            // Collect Stars
+            for(let i=this.stars.length-1; i>=0; i--) {
+                if(MathUtils.circleCollision(p, this.stars[i])) {
+                    if(pIndex === 0) this.p1Score++; else this.p2Score++;
+                    this.stars.splice(i,1);
+                    this.spawnStar();
+                    this.particles.emit(p.pos.x, p.pos.y, 10, '#fff');
+                }
+            }
+
+            // Hit Asteroids
+            this.asteroids.forEach(ast => {
+                if(MathUtils.circleCollision(p, ast)) {
+                    MathUtils.resolveElasticCollision(p, ast);
+                    this.screenShake(0.1, 5);
+                }
+            });
+        });
+
+        this.asteroids.forEach(ast => {
+            ast.pos.add(Vector2.mult(ast.vel, dt));
+            if(ast.pos.x < ast.radius || ast.pos.x > this.width-ast.radius) ast.vel.x *= -1;
+            if(ast.pos.y < ast.radius || ast.pos.y > this.height-ast.radius) ast.vel.y *= -1;
+        });
+    }
+    drawEntities() {
+        this.stars.forEach(s => {
+            this.ctx.fillStyle = '#ffaa00';
+            this.ctx.shadowBlur = 10; this.ctx.shadowColor = '#ffaa00';
+            this.ctx.beginPath(); this.ctx.arc(s.pos.x, s.pos.y, s.radius, 0, Math.PI*2); this.ctx.fill();
+        });
+        this.ctx.shadowBlur = 0;
+
+        this.asteroids.forEach(ast => {
+            this.ctx.fillStyle = '#555';
+            this.ctx.strokeStyle = '#888';
+            this.ctx.lineWidth = 2;
+            this.ctx.beginPath(); this.ctx.arc(ast.pos.x, ast.pos.y, ast.radius, 0, Math.PI*2); this.ctx.fill(); this.ctx.stroke();
+        });
+
+        [this.p1, this.p2].forEach(p => {
+            this.ctx.fillStyle = p.color;
+            this.ctx.shadowBlur = 15; this.ctx.shadowColor = p.color;
+            this.ctx.beginPath(); this.ctx.arc(p.pos.x, p.pos.y, p.radius, 0, Math.PI*2); this.ctx.fill();
+        });
+        this.ctx.shadowBlur = 0;
+    }
+}
+
+/**
+ * GAME 10: ZONE CONTROL
+ * Stand in the center zone to capture it. Push opponent out.
+ */
+class Game10_Zone extends GameEngine {
+    resetEntities() {
+        this.p1 = { pos: new Vector2(200, this.height/2), vel: new Vector2(0,0), radius: 20, color: this.gameConfig.p1Color, mass: 1 };
+        this.p2 = { pos: new Vector2(this.width-200, this.height/2), vel: new Vector2(0,0), radius: 20, color: this.gameConfig.p2Color, mass: 1 };
+        this.zone = { pos: new Vector2(this.width/2, this.height/2), radius: 150 };
+        this.capture = 0; // -100 to 100
+        this.gameConfig.winScore = 1; // Instant win
+    }
+    updateLogic(dt) {
+        let accel = 1500; let friction = 0.90;
+        
+        let p1Input = new Vector2(0,0);
+        if(this.input.isDown('KeyW')) p1Input.y -= 1; if(this.input.isDown('KeyS')) p1Input.y += 1;
+        if(this.input.isDown('KeyA')) p1Input.x -= 1; if(this.input.isDown('KeyD')) p1Input.x += 1;
+        if(p1Input.magSq() > 0) { p1Input.normalize(); this.p1.vel.add(Vector2.mult(p1Input, accel * dt)); }
+        
+        let p2Input = new Vector2(0,0);
+        if(this.input.isDown('ArrowUp')) p2Input.y -= 1; if(this.input.isDown('ArrowDown')) p2Input.y += 1;
+        if(this.input.isDown('ArrowLeft')) p2Input.x -= 1; if(this.input.isDown('ArrowRight')) p2Input.x += 1;
+        if(p2Input.magSq() > 0) { p2Input.normalize(); this.p2.vel.add(Vector2.mult(p2Input, accel * dt)); }
+
+        [this.p1, this.p2].forEach(p => {
+            p.vel.mult(friction);
+            p.pos.add(Vector2.mult(p.vel, dt));
+            p.pos.x = MathUtils.clamp(p.pos.x, p.radius, this.width-p.radius);
+            p.pos.y = MathUtils.clamp(p.pos.y, p.radius, this.height-p.radius);
+        });
+
+        if(MathUtils.circleCollision(this.p1, this.p2)) { MathUtils.resolveElasticCollision(this.p1, this.p2); }
+
+        let p1In = this.p1.pos.dist(this.zone.pos) < this.zone.radius;
+        let p2In = this.p2.pos.dist(this.zone.pos) < this.zone.radius;
+
+        if(p1In && !p2In) this.capture -= 20 * dt;
+        else if(p2In && !p1In) this.capture += 20 * dt;
+        else if(!p1In && !p2In) {
+            if(this.capture < 0) this.capture += 10 * dt;
+            if(this.capture > 0) this.capture -= 10 * dt;
+        }
+
+        if(this.capture <= -100) this.p1Score = 1;
+        if(this.capture >= 100) this.p2Score = 1;
+    }
+    drawEntities() {
+        // Zone
+        let grad = this.ctx.createRadialGradient(this.zone.pos.x, this.zone.pos.y, 0, this.zone.pos.x, this.zone.pos.y, this.zone.radius);
+        let zoneColor = 'rgba(255,255,255,0.1)';
+        if(this.capture < 0) zoneColor = `rgba(0, 243, 255, ${Math.abs(this.capture)/100 * 0.5})`;
+        if(this.capture > 0) zoneColor = `rgba(255, 0, 234, ${Math.abs(this.capture)/100 * 0.5})`;
+        
+        grad.addColorStop(0, zoneColor); grad.addColorStop(1, 'transparent');
+        this.ctx.fillStyle = grad;
+        this.ctx.beginPath(); this.ctx.arc(this.zone.pos.x, this.zone.pos.y, this.zone.radius, 0, Math.PI*2); this.ctx.fill();
+        
+        this.ctx.strokeStyle = '#fff'; this.ctx.lineWidth = 2;
+        this.ctx.beginPath(); this.ctx.arc(this.zone.pos.x, this.zone.pos.y, this.zone.radius, 0, Math.PI*2); this.ctx.stroke();
+
+        // Progress bar
+        this.ctx.fillStyle = '#333';
+        this.ctx.fillRect(this.width/2 - 200, 20, 400, 20);
+        if(this.capture < 0) {
+            this.ctx.fillStyle = this.gameConfig.p1Color;
+            this.ctx.fillRect(this.width/2, 20, (this.capture/100) * 200, 20);
+        } else if(this.capture > 0) {
+            this.ctx.fillStyle = this.gameConfig.p2Color;
+            this.ctx.fillRect(this.width/2, 20, (this.capture/100) * 200, 20);
+        }
+
+        [this.p1, this.p2].forEach(p => {
+            this.ctx.fillStyle = p.color;
+            this.ctx.shadowBlur = 15; this.ctx.shadowColor = p.color;
+            this.ctx.beginPath(); this.ctx.arc(p.pos.x, p.pos.y, p.radius, 0, Math.PI*2); this.ctx.fill();
+        });
+        this.ctx.shadowBlur = 0;
+    }
+}
+
+/**
+ * MAIN APP CONTROLLER
+ */
+const gamesList = [
+    { id: 1, title: 'Neon Pong', desc: 'Hyper-speed pong. Use paddles to curve the ball.', class: Game1_NeonPong, rules: 'Score 5 points. Hitting the ball while moving adds curve and speed.', p1: 'W / S', p2: 'UP / DOWN' },
+    { id: 2, title: 'Orbital Shooters', desc: 'Gravitational combat around a black hole.', class: Game2_Orbital, rules: 'Deplete enemy HP (3). Do not fall into the black hole.', p1: 'W,A,D + Space', p2: 'Arrows + Enter' },
+    { id: 3, title: 'Sumo Bots', desc: 'Heavy momentum physics. Push them out.', class: Game3_Sumo, rules: 'Push the opponent out of the ring 5 times.', p1: 'W,A,S,D + Space', p2: 'Arrows + Enter' },
+    { id: 4, title: 'Neon Tanks', desc: 'Tactical shooting with bouncing bullets.', class: Game4_Tanks, rules: 'Hit the enemy tank 5 times. Bullets bounce off walls.', p1: 'W,A,S,D + Space', p2: 'Arrows + Enter' },
+    { id: 5, title: 'Grid Duels', desc: 'High-speed light cycle combat.', class: Game5_Tron, rules: 'Force opponent to crash into walls or trails.', p1: 'W,A,S,D', p2: 'Arrows' },
+    { id: 6, title: 'Laser Hockey', desc: 'Zero friction air hockey.', class: Game6_Hockey, rules: 'Knock the puck into the enemy goal 5 times.', p1: 'W,A,S,D', p2: 'Arrows' },
+    { id: 7, title: 'Gravity Joust', desc: 'Thrust and attack from above.', class: Game7_Joust, rules: 'Land your lance on top of the enemy to score.', p1: 'W,A,D', p2: 'Left,Up,Right' },
+    { id: 8, title: 'Dodge & Shoot', desc: 'Twin stick style bullet hell.', class: Game8_Dodge, rules: 'Dodge bullets and collect powerups. First to 5.', p1: 'W,A,S,D + Space', p2: 'Arrows + Enter' },
+    { id: 9, title: 'Asteroid Miner', desc: 'Collect 10 stars while dodging asteroids.', class: Game9_Miner, rules: 'First to collect 10 stars wins. Asteroids cause stun.', p1: 'W,A,S,D', p2: 'Arrows' },
+    { id: 10, title: 'Zone Control', desc: 'Dominate the center circle.', class: Game10_Zone, rules: 'Stand in the center to fill your capture bar to 100%.', p1: 'W,A,S,D', p2: 'Arrows' }
+];
+
+class App {
+    constructor() {
+        this.canvas = document.getElementById('game-canvas');
+        this.ctx = this.canvas.getContext('2d');
+        this.menuScreen = document.getElementById('menu-screen');
+        this.overlay = document.getElementById('overlay');
+        this.btnStart = document.getElementById('btn-start');
+        this.btnBack = document.getElementById('btn-back');
+        this.fpsCounter = document.getElementById('fps-counter');
+        
+        this.input = new InputManager();
+        this.currentGame = null;
+        this.lastTime = performance.now();
+        this.animationId = null;
+
+        this.resize();
+        window.addEventListener('resize', () => this.resize());
+        this.buildMenu();
+
+        this.btnStart.addEventListener('click', () => this.startGame());
+        this.btnBack.addEventListener('click', () => this.returnToMenu());
+
+        this.loop = this.loop.bind(this);
+        requestAnimationFrame(this.loop);
+    }
+
+    resize() {
+        let container = document.getElementById('main-display');
+        this.canvas.width = container.clientWidth;
+        this.canvas.height = container.clientHeight;
+        if(this.currentGame) {
+            this.currentGame.width = this.canvas.width;
+            this.currentGame.height = this.canvas.height;
+        }
+    }
+
+    buildMenu() {
+        this.menuScreen.innerHTML = '';
+        gamesList.forEach(game => {
+            let card = document.createElement('div');
+            card.className = 'game-card';
+            card.innerHTML = `
+                <div class="game-title">${game.title}</div>
+                <div class="game-desc">${game.desc}</div>
+                <div class="game-controls">
+                    <span class="p1-controls">P1: ${game.p1}</span>
+                    <span class="p2-controls">P2: ${game.p2}</span>
+                </div>
+            `;
+            card.addEventListener('click', () => this.showOverlay(game));
+            this.menuScreen.appendChild(card);
+        });
+    }
+
+    showOverlay(gameInfo) {
+        this.selectedGameInfo = gameInfo;
+        document.getElementById('overlay-title').innerText = gameInfo.title;
+        document.getElementById('overlay-rules').innerText = gameInfo.rules;
+        this.menuScreen.classList.add('hidden');
+        this.overlay.classList.add('active');
+        this.btnBack.classList.add('active');
+    }
+
+    startGame() {
+        this.overlay.classList.remove('active');
+        this.canvas.classList.add('active');
+        this.currentGame = new this.selectedGameInfo.class(this.canvas, this.input);
+        this.currentGame.init();
+    }
+
+    returnToMenu() {
+        this.currentGame = null;
+        this.canvas.classList.remove('active');
+        this.overlay.classList.remove('active');
+        this.menuScreen.classList.remove('hidden');
+        this.btnBack.classList.remove('active');
+        this.ctx.clearRect(0,0,this.canvas.width, this.canvas.height);
+    }
+
+    loop(currentTime) {
+        let dt = (currentTime - this.lastTime) / 1000;
+        this.lastTime = currentTime;
+        if(dt > 0.1) dt = 0.1; // Limit dt to prevent huge jumps
+
+        if(this.currentGame) {
+            this.currentGame.update(dt);
+            this.currentGame.draw();
+        }
+
+        this.fpsCounter.innerText = `FPS: ${Math.round(1/dt)}`;
+        requestAnimationFrame(this.loop);
+    }
+}
+
+// Initialize Application
+window.onload = () => { new App(); };
 
 </script>
 </body>
